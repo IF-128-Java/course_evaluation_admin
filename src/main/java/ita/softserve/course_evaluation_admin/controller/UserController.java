@@ -31,7 +31,6 @@ public class UserController {
 
     @PatchMapping("/add-roles")
     public ResponseEntity<UserRolesDto> updateRole(@RequestBody UserRolesDto dto) {
-        System.out.println(dto);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(UserRolesDtoMapper.toDto(userService.updateRoles(dto)));
     }
