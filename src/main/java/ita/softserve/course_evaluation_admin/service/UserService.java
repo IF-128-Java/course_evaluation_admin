@@ -13,6 +13,4 @@ public interface UserService {
     User findById(long id);
 
     User updateRoles(UserRolesDto dto);
-
-
 }

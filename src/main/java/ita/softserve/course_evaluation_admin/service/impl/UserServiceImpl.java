@@ -3,15 +3,14 @@ package ita.softserve.course_evaluation_admin.service.impl;
 import ita.softserve.course_evaluation_admin.dto.user.UserDto;
 import ita.softserve.course_evaluation_admin.dto.user.UserRolesDto;
 import ita.softserve.course_evaluation_admin.entity.User;
-import ita.softserve.course_evaluation_admin.exception.exceptions.WrongEmailException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
 import ita.softserve.course_evaluation_admin.repository.UserRepository;
 import ita.softserve.course_evaluation_admin.service.UserService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static ita.softserve.course_evaluation_admin.dto.user.UserDtoMapper.fromDto;
 import static ita.softserve.course_evaluation_admin.dto.user.UserDtoMapper.toDto;
 
 @Service
@@ -24,7 +23,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> findAll() {
-        return toDto(userRepository.findAll());
+        List<User> users = userRepository.findAll();
+        return users.isEmpty() ? new ArrayList<>() : toDto(users);
     }
 
     @Override
