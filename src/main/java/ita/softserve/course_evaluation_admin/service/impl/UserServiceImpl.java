@@ -1,6 +1,7 @@
 package ita.softserve.course_evaluation_admin.service.impl;
 
 import ita.softserve.course_evaluation_admin.dto.user.UserDto;
+import ita.softserve.course_evaluation_admin.dto.user.UserRolesDto;
 import ita.softserve.course_evaluation_admin.entity.User;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongEmailException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
@@ -33,11 +34,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User update(UserDto dto) {
-        Long id = dto.getId();
-        User user = findById(id);
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
+    public User updateRoles(UserRolesDto dto) {
+        User user = findById(dto.getId());
         user.setRoles(dto.getRoles());
         return userRepository.save(user);
     }
