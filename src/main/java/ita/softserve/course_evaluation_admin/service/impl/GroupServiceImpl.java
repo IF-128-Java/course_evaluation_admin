@@ -67,4 +67,10 @@ public class GroupServiceImpl implements GroupService {
     public GroupStudentDto getGroupProfile(long id) {
         return GroupStudentDtoMapper.toDto(findById(id));
     }
+
+    @Override
+    public Group create(GroupDto dto) {
+        dto.setId(null);
+        return groupRepository.save(GroupDtoMapper.fromDto(dto));
+    }
 }

@@ -15,4 +15,12 @@ public class GroupDtoMapper {
     public static List<GroupDto> toDto(List<Group> groups) {
         return Objects.isNull(groups) ? Collections.emptyList() : groups.stream().map(GroupDtoMapper::toDto).collect(Collectors.toList());
     }
+
+    public static Group fromDto(GroupDto dto) {
+        Group group = new Group();
+        group.setId(dto.getId());
+        group.setGroupName(dto.getGroupName());
+        return group;
+
+    }
 }

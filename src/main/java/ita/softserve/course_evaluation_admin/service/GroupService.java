@@ -17,4 +17,6 @@ public interface GroupService {
     GroupStudentRequestDto removeStudents(GroupStudentRequestDto dto);
 
     GroupStudentDto getGroupProfile(long id);
+
+    Group create(GroupDto dto);
 }
