@@ -1,9 +1,9 @@
 package ita.softserve.course_evaluation_admin.controller;
 
 
-import ita.softserve.course_evaluation_admin.dto.group.GroupDto;
-import ita.softserve.course_evaluation_admin.dto.group.GroupListDto;
 import ita.softserve.course_evaluation_admin.dto.group.GroupStudentDto;
+import ita.softserve.course_evaluation_admin.dto.group.GroupDto;
+import ita.softserve.course_evaluation_admin.dto.group.GroupStudentRequestDto;
 import ita.softserve.course_evaluation_admin.service.GroupService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,20 +26,20 @@ public class GroupController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GroupListDto>> getAll() {
+    public ResponseEntity<List<GroupDto>> getAll() {
         return ResponseEntity.status(HttpStatus.OK).body(groupService.findAll());
     }
     @GetMapping("/{id}")
-    public ResponseEntity<GroupDto> getById(@PathVariable long id) {
+    public ResponseEntity<GroupStudentDto> getById(@PathVariable long id) {
         return ResponseEntity.status(HttpStatus.OK).body(groupService.getGroupProfile(id));
     }
     @PatchMapping("/add-students")
-    public ResponseEntity<GroupStudentDto> addStudents(@RequestBody GroupStudentDto dto) {
+    public ResponseEntity<GroupStudentRequestDto> addStudents(@RequestBody GroupStudentRequestDto dto) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(groupService.addStudents(dto));
     }
     @PatchMapping("/remove-students")
-    public ResponseEntity<GroupStudentDto> removeStudents(@RequestBody GroupStudentDto dto) {
+    public ResponseEntity<GroupStudentRequestDto> removeStudents(@RequestBody GroupStudentRequestDto dto) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(groupService.removeStudents(dto));
     }
