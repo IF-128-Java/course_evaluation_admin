@@ -2,7 +2,6 @@ package ita.softserve.course_evaluation_admin.controller;
 
 import ita.softserve.course_evaluation_admin.dto.user.UserDto;
 import ita.softserve.course_evaluation_admin.dto.user.UserRolesDto;
-import ita.softserve.course_evaluation_admin.dto.user.UserRolesDtoMapper;
 import ita.softserve.course_evaluation_admin.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +31,6 @@ public class UserController {
     @PatchMapping("/add-roles")
     public ResponseEntity<UserRolesDto> updateRole(@RequestBody UserRolesDto dto) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(UserRolesDtoMapper.toDto(userService.updateRoles(dto)));
+                .body(userService.updateRoles(dto));
     }
 }
