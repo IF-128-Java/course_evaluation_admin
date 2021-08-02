@@ -1,12 +1,6 @@
 package ita.softserve.course_evaluation_admin.service.impl;
 
 
-import ita.softserve.course_evaluation_admin.dto.group.GroupStudentDto;
-import ita.softserve.course_evaluation_admin.dto.group.GroupStudentDtoMapper;
-import ita.softserve.course_evaluation_admin.dto.group.GroupDto;
-import ita.softserve.course_evaluation_admin.dto.group.GroupDtoMapper;
-import ita.softserve.course_evaluation_admin.dto.group.GroupStudentRequestDto;
-import ita.softserve.course_evaluation_admin.dto.group.GroupStudentRequestDtoMapper;
 import ita.softserve.course_evaluation_admin.entity.Group;
 import ita.softserve.course_evaluation_admin.entity.User;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
@@ -14,7 +8,6 @@ import ita.softserve.course_evaluation_admin.repository.GroupRepository;
 import ita.softserve.course_evaluation_admin.service.GroupService;
 import ita.softserve.course_evaluation_admin.service.UserService;
 import org.springframework.stereotype.Service;
-
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,8 +23,8 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<GroupDto> findAll() {
-        return GroupDtoMapper.toDto(groupRepository.findAll());
+    public List<Group> findAll() {
+        return groupRepository.findAll();
     }
 
     @Override
@@ -41,36 +34,28 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public GroupStudentRequestDto addStudents(GroupStudentRequestDto dto) {
-        Group foundGroup = findById(dto.getId());
-        List<User> studentList = dto.getStudentIds()
+    public Group addStudents(Group group, List<User> students) {
+        List<User> studentList = students
                 .stream()
-                .map(userService::findById)
-                .peek(u->u.setGroup(foundGroup)).collect(Collectors.toList());
-        foundGroup.setStudents(studentList);
-
-        return GroupStudentRequestDtoMapper.toDto(groupRepository.save(foundGroup));
+                .peek(u -> u.setGroup(group)).collect(Collectors.toList());
+        group.setStudents(studentList);
+        return groupRepository.save(group);
     }
 
     @Override
-    public GroupStudentRequestDto removeStudents(GroupStudentRequestDto dto) {
-        Group foundGroup = findById(dto.getId());
-        List<User> studentList = dto.getStudentIds()
+    public Group removeStudents(Group group, List<User> students) {
+        List<User> studentList = students
                 .stream()
-                .map(userService::findById)
-                .peek(u->u.setGroup(null)).collect(Collectors.toList());
-        foundGroup.setStudents(studentList);
-        return GroupStudentRequestDtoMapper.toDto(groupRepository.save(foundGroup));
+                .peek(u -> u.setGroup(null)).collect(Collectors.toList());
+        group.setStudents(studentList);
+        return groupRepository.save(group);
     }
 
     @Override
-    public GroupStudentDto getGroupProfile(long id) {
-        return GroupStudentDtoMapper.toDto(findById(id));
-    }
-
-    @Override
-    public Group create(GroupDto dto) {
-        dto.setId(null);
-        return groupRepository.save(GroupDtoMapper.fromDto(dto));
+    public Group create(String groupName) {
+        return groupRepository.save(Group
+                .builder()
+                .groupName(groupName)
+                .build());
     }
 }
