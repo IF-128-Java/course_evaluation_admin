@@ -2,13 +2,13 @@ package ita.softserve.course_evaluation_admin.service.impl;
 
 import ita.softserve.course_evaluation_admin.dto.user.UserDto;
 import ita.softserve.course_evaluation_admin.dto.user.UserRolesDto;
+import ita.softserve.course_evaluation_admin.dto.user.UserRolesDtoMapper;
 import ita.softserve.course_evaluation_admin.entity.User;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
 import ita.softserve.course_evaluation_admin.repository.UserRepository;
 import ita.softserve.course_evaluation_admin.service.UserService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static ita.softserve.course_evaluation_admin.dto.user.UserDtoMapper.toDto;
@@ -23,8 +23,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> findAll() {
-        List<User> users = userRepository.findAll();
-        return users.isEmpty() ? new ArrayList<>() : toDto(users);
+        return toDto(userRepository.findAll());
     }
 
     @Override
@@ -34,11 +33,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateRoles(UserRolesDto dto) {
+    public UserRolesDto updateRoles(UserRolesDto dto) {
         User user = findById(dto.getId());
         user.setRoles(dto.getRoles());
-        return userRepository.save(user);
+        return UserRolesDtoMapper.toDto(userRepository.save(user));
     }
-
-
 }
