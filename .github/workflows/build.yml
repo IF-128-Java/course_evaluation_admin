@@ -13,9 +13,9 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_USER: ${{ course_evaluation_admin_db_username }}
-          POSTGRES_PASSWORD: ${{ course_evaluation_admin_db_password }}
-          POSTGRES_DB: ${{ course_evaluation_admin_db_url }}
+          POSTGRES_USER: ${{ secrets.COURSE_EVALUATION_ADMIN_DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.COURSE_EVALUATION_ADMIN_DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.COURSE_EVALUATION_ADMIN_DB_URL }}
 
         options: >-
           --health-cmd pg_isready
