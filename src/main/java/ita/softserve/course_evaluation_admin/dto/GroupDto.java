@@ -1,7 +1,7 @@
-package ita.softserve.course_evaluation_admin.dto.group;
+package ita.softserve.course_evaluation_admin.dto;
 
-import ita.softserve.course_evaluation_admin.dto.user.UserDto;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +11,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupStudentDto {
+@Builder
+public class GroupDto {
     private Long id;
 
     private String groupName;

@@ -1,5 +1,6 @@
-package ita.softserve.course_evaluation_admin.dto.user;
+package ita.softserve.course_evaluation_admin.dto.mapper;
 
+import ita.softserve.course_evaluation_admin.dto.UserDto;
 import ita.softserve.course_evaluation_admin.entity.User;
 
 import java.util.Collections;
@@ -27,12 +28,10 @@ public class UserDtoMapper {
     }
 
     public static List<UserDto> toDto(List<User> users) {
-        UserDtoMapper userDtoMapper = new UserDtoMapper();
         return Objects.isNull(users) ? Collections.emptyList() : users.stream().map(UserDtoMapper::toDto).collect(Collectors.toList());
     }
 
-    public List<User> fromDto(List<UserDto> entities) {
-        UserDtoMapper userDtoMapper = new UserDtoMapper();
+    public static List<User> fromDto(List<UserDto> entities) {
         return Objects.isNull(entities) ? Collections.emptyList() : entities.stream().map(UserDtoMapper::fromDto).collect(Collectors.toList());
     }
 }

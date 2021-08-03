@@ -1,4 +1,4 @@
-package ita.softserve.course_evaluation_admin.dto.user;
+package ita.softserve.course_evaluation_admin.dto;
 
 import ita.softserve.course_evaluation_admin.entity.Role;
 import lombok.AllArgsConstructor;
