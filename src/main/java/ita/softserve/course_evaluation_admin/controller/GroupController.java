@@ -10,6 +10,7 @@ import ita.softserve.course_evaluation_admin.service.GroupService;
 import ita.softserve.course_evaluation_admin.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -70,5 +71,12 @@ public class GroupController {
                 .collect(Collectors.toList());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(GroupDtoMapper.toDto(groupService.removeStudents(groupFound, usersFound)));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteGroup(@PathVariable long id) {
+        final Group groupFound = groupService.findById(id);
+        groupService.delete(groupFound);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

@@ -1,6 +1,5 @@
 package ita.softserve.course_evaluation_admin.service.impl;
 
-
 import ita.softserve.course_evaluation_admin.entity.Group;
 import ita.softserve.course_evaluation_admin.entity.User;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
@@ -57,6 +56,14 @@ public class GroupServiceImpl implements GroupService {
                 .peek(u -> u.setGroup(null)).collect(Collectors.toList());
         group.setStudents(studentList);
         return groupRepository.save(group);
+    }
+
+    @Override
+    public void delete(Group group) {
+        if (!group.getStudents().isEmpty()) {
+            throw new WrongIdException("The list of students is not empty in the group with id: " + group.getId());
+        }
+        groupRepository.delete(group);
     }
 
     @Override
