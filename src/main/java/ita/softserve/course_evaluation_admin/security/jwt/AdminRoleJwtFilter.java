@@ -30,9 +30,9 @@ public class AdminRoleJwtFilter extends GenericFilterBean {
             username = jwtTokenUtils.getUsername(token);
             roles = jwtTokenUtils.getRoles(username);
         }
-        if (roles != null && roles.contains(Role.ROLE_ADMIN)) {
-            filterChain.doFilter(servletRequest, servletResponse);
+        if (roles == null || !roles.contains(Role.ROLE_ADMIN)) {
+            throw new JwtAuthenticationException("You don’t have permission to access this resource");
         }
-        throw new JwtAuthenticationException("You don’t have permission to access this resource");
+        filterChain.doFilter(servletRequest, servletResponse);
     }
 }
