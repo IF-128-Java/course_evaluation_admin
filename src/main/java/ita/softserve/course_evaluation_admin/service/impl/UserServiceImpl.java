@@ -2,6 +2,7 @@ package ita.softserve.course_evaluation_admin.service.impl;
 
 import ita.softserve.course_evaluation_admin.entity.Role;
 import ita.softserve.course_evaluation_admin.entity.User;
+import ita.softserve.course_evaluation_admin.exception.exceptions.WrongEmailException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
 import ita.softserve.course_evaluation_admin.repository.UserRepository;
 import ita.softserve.course_evaluation_admin.service.UserService;
@@ -34,5 +35,10 @@ public class UserServiceImpl implements UserService {
     public User updateRoles(User user, Set<Role> roles) {
         user.setRoles(roles);
         return userRepository.save(user);
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new WrongEmailException("The user does not exist by this email: " + email));
     }
 }
