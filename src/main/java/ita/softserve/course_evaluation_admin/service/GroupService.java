@@ -14,6 +14,7 @@ public interface GroupService {
 
     Group removeStudents(Group group, List<User> users);
 
+    void delete(Group group);
 
     Group create(String userName);
 }
