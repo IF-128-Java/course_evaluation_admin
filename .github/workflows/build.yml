@@ -48,4 +48,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          course_evaluation_admin_JWT_header: ${{ secrets.course_evaluation_admin_JWT_header }}
+          course_evaluation_admin_JWT_secret: ${{ secrets.course_evaluation_admin_JWT_secret }}
+          jwt.authentication_scheme: ${{ secrets.jwt.authentication_scheme }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
