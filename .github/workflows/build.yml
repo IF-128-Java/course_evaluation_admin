@@ -15,7 +15,7 @@ jobs:
         env:
           POSTGRES_USER: ${{ secrets.COURSE_EVALUATION_ADMIN_DB_USERNAME }}
           POSTGRES_PASSWORD: ${{ secrets.COURSE_EVALUATION_ADMIN_DB_PASSWORD }}
-          POSTGRES_DB: course_evaluation
+          POSTGRES_DB: ${{ secrets.COURSE_EVALUATION_ADMIN_DB_NAME }}
 
         options: >-
           --health-cmd pg_isready
@@ -48,6 +48,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          course_evaluation_admin_db_url: ${{ secrets.COURSE_EVALUATION_ADMIN_DB_URL }}
           course_evaluation_admin_JWT_header: ${{ secrets.COURSE_EVALUATION_ADMIN_JWT_HEADER }}
           course_evaluation_admin_JWT_secret: ${{ secrets.COURSE_EVALUATION_ADMIN_JWT_SECRET }}
           course_evaluation_admin_JWT_authentication_scheme: ${{ secrets.COURSE_EVALUATION_ADMIN_JWT_AUTHENTICATION_SCHEME }}
