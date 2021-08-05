@@ -1,19 +1,28 @@
 package ita.softserve.course_evaluation_admin.security.jwt;
 
-import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import ita.softserve.course_evaluation_admin.entity.Role;
-import ita.softserve.course_evaluation_admin.service.UserService;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
-import java.util.Set;
 
 @Component
-public class JwtTokenUtils {
+public class JwtUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+
     @Value("${jwt.secret}")
     private String jwtKey;
     @Value("${jwt.header}")
@@ -21,11 +30,12 @@ public class JwtTokenUtils {
     @Value("${jwt.authentication_scheme}")
     private String authenticationScheme;
 
-    private final UserService userService;
+    private final UserDetailsService userDetailsService;
 
-    public JwtTokenUtils(UserService userService) {
-        this.userService = userService;
+    public JwtUtils(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
+
 
     @PostConstruct
     protected void init() {
@@ -33,15 +43,21 @@ public class JwtTokenUtils {
     }
 
     public boolean validate(String token) {
-        if (token == null) {
-            return false;
-        }
         try {
             Jwts.parser().setSigningKey(jwtKey).parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
+        } catch (SignatureException e) {
+            logger.error("Invalid JWT signature: {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            logger.error("Invalid JWT token: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            logger.error("JWT token is expired: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            logger.error("JWT token is unsupported: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            logger.error("JWT claims string is empty: {}", e.getMessage());
         }
+        return false;
     }
 
     public String getToken(HttpServletRequest req) {
@@ -56,7 +72,8 @@ public class JwtTokenUtils {
         return Jwts.parser().setSigningKey(jwtKey).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public Set<Role> getRoles(String username) {
-        return userService.findByEmail(username).getRoles();
+    public Authentication getAuthentication(String token) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(getUsername(token));
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 }
