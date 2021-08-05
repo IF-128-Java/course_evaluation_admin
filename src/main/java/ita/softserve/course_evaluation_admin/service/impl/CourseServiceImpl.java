@@ -25,7 +25,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseDto findById(long id) {
         return CourseDtoMapper.toDto(courseRepository.findById(id)
-                .orElseThrow(() -> new WrongIdException("The group does not exist by this id: " + id)));
+                .orElseThrow(() -> new WrongIdException("The course does not exist by this id: " + id)));
     }
 
     @Override
