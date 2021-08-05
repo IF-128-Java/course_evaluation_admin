@@ -14,10 +14,10 @@ import java.io.IOException;
 import java.util.Set;
 
 @Component
-public class AdminRoleJwtFilter extends GenericFilterBean {
+public class JwtTokenFilter extends GenericFilterBean {
     private final JwtTokenUtils jwtTokenUtils;
 
-    public AdminRoleJwtFilter(JwtTokenUtils jwtTokenUtils) {
+    public JwtTokenFilter(JwtTokenUtils jwtTokenUtils) {
         this.jwtTokenUtils = jwtTokenUtils;
     }
 
