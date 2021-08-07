@@ -12,7 +12,7 @@ public interface UserService {
 
     User findById(long id);
 
-    UserDto updateRoles(long user_id, Set<Role> roles);
+    UserDto updateRoles(long userId, Set<Role> roles);
 
     List<UserDto> findUsersDtoByRoleAndGroupIsNull(int roleOrdinal);
 

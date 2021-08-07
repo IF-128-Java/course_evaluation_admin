@@ -59,8 +59,8 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group addStudents(long group_id, List<UserDto> studentDtos) {
-        final Group groupFound = findById(group_id);
+    public Group addStudents(long groupId, List<UserDto> studentDtos) {
+        final Group groupFound = findById(groupId);
 
         final List<User> usersFound = studentDtos
                 .stream()
@@ -69,7 +69,7 @@ public class GroupServiceImpl implements GroupService {
                 .collect(Collectors.toList());
 
         final Optional<User> notExpectedUser = usersFound.stream()
-                .filter(s -> s.getGroup() != null && s.getGroup().getId() != group_id).findFirst();
+                .filter(s -> s.getGroup() != null && s.getGroup().getId() != groupId).findFirst();
         notExpectedUser.ifPresent(u -> {
             throw new WrongIdException("The user with id: " + u.getId() + " already included in the group with id: " + u.getGroup().getId());
         });
@@ -81,8 +81,8 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group removeStudents(long group_id, List<UserDto> studentDtos) {
-        final Group groupFound = findById(group_id);
+    public Group removeStudents(long groupId, List<UserDto> studentDtos) {
+        final Group groupFound = findById(groupId);
         final List<User> usersFound = studentDtos
                 .stream()
                 .map(UserDto::getId)

@@ -13,9 +13,9 @@ public interface GroupService {
 
     GroupDto findGroupDtoById(long id);
 
-    Group addStudents(long group_id, List<UserDto> users);
+    Group addStudents(long groupId, List<UserDto> users);
 
-    Group removeStudents(long group_id, List<UserDto> users);
+    Group removeStudents(long groupId, List<UserDto> users);
 
     void deleteById(long id);
 

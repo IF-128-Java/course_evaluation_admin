@@ -33,8 +33,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateRoles(long user_id, Set<Role> roles) {
-        final User foundUser = findById(user_id);
+    public UserDto updateRoles(long userId, Set<Role> roles) {
+        final User foundUser = findById(userId);
         foundUser.setRoles(roles);
         return UserDtoMapper.toDto(userRepository.save(foundUser));
     }
