@@ -1,8 +1,9 @@
 package ita.softserve.course_evaluation_admin.service.impl;
 
+import ita.softserve.course_evaluation_admin.dto.UserDto;
+import ita.softserve.course_evaluation_admin.dto.mapper.UserDtoMapper;
 import ita.softserve.course_evaluation_admin.entity.Role;
 import ita.softserve.course_evaluation_admin.entity.User;
-import ita.softserve.course_evaluation_admin.exception.exceptions.WrongEmailException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
 import ita.softserve.course_evaluation_admin.repository.UserRepository;
 import ita.softserve.course_evaluation_admin.service.UserService;
@@ -21,8 +22,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserDto> findAllUserDto() {
+        return UserDtoMapper.toDto(userRepository.findAll());
     }
 
     @Override
@@ -32,13 +33,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateRoles(User user, Set<Role> roles) {
-        user.setRoles(roles);
-        return userRepository.save(user);
+    public UserDto updateRoles(long user_id, Set<Role> roles) {
+        final User foundUser = findById(user_id);
+        foundUser.setRoles(roles);
+        return UserDtoMapper.toDto(userRepository.save(foundUser));
     }
 
     @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new WrongEmailException("The user does not exist by this email: " + email));
+    public List<UserDto> findUsersDtoByRoleAndGroupIsNull(int roleOrdinal) {
+        return UserDtoMapper.toDto(userRepository
+                .findUsersByRoleAndGroupIsNull(roleOrdinal));
+    }
+
+    @Override
+    public UserDto findUserDtoById(long id) {
+        return UserDtoMapper.toDto(findById(id));
     }
 }

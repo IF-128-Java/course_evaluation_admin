@@ -2,6 +2,7 @@ package ita.softserve.course_evaluation_admin.service.impl;
 
 import ita.softserve.course_evaluation_admin.dto.CourseDto;
 import ita.softserve.course_evaluation_admin.dto.mapper.CourseDtoMapper;
+import ita.softserve.course_evaluation_admin.entity.Course;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
 import ita.softserve.course_evaluation_admin.repository.CourseRepository;
 import ita.softserve.course_evaluation_admin.service.CourseService;
@@ -18,18 +19,23 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<CourseDto> findAll() {
+    public List<CourseDto> findAllCourseDto() {
         return CourseDtoMapper.toDto(courseRepository.findAll());
     }
 
     @Override
-    public CourseDto findById(long id) {
-        return CourseDtoMapper.toDto(courseRepository.findById(id)
-                .orElseThrow(() -> new WrongIdException("The course does not exist by this id: " + id)));
+    public CourseDto findCourseDtoById(long id) {
+        return CourseDtoMapper.toDto(findById(id));
     }
 
     @Override
-    public CourseDto create(CourseDto courseDto) {
-        return CourseDtoMapper.toDto(courseRepository.save(CourseDtoMapper.fromDto(courseDto)));
+    public Course findById(long id) {
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new WrongIdException("The course does not exist by this id: " + id));
+    }
+
+    @Override
+    public Course create(CourseDto courseDto) {
+        return courseRepository.save(CourseDtoMapper.fromDto(courseDto));
     }
 }
