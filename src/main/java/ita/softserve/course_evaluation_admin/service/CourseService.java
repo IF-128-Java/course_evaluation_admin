@@ -13,4 +13,7 @@ public interface CourseService {
     Course findById(long id);
 
     Course create(CourseDto courseDto);
+
+    List<CourseDto> findCourseDtoByGroupId(long id);
 }
+
