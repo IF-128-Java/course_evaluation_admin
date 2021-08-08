@@ -1,20 +1,23 @@
 package ita.softserve.course_evaluation_admin.service;
 
+import ita.softserve.course_evaluation_admin.dto.GroupDto;
+import ita.softserve.course_evaluation_admin.dto.UserDto;
 import ita.softserve.course_evaluation_admin.entity.Group;
-import ita.softserve.course_evaluation_admin.entity.User;
 
 import java.util.List;
 
 public interface GroupService {
-    List<Group> findAll();
+    List<GroupDto> findAllUserDto();
 
     Group findById(long id);
 
-    Group addStudents(Group group, List<User> users);
+    GroupDto findGroupDtoById(long id);
 
-    Group removeStudents(Group group, List<User> users);
+    Group addStudents(long groupId, List<UserDto> users);
 
-    void delete(Group group);
+    Group removeStudents(long groupId, List<UserDto> users);
+
+    void deleteById(long id);
 
     Group create(String userName);
 }

@@ -4,10 +4,7 @@ package ita.softserve.course_evaluation_admin.controller;
 import ita.softserve.course_evaluation_admin.dto.GroupDto;
 import ita.softserve.course_evaluation_admin.dto.UserDto;
 import ita.softserve.course_evaluation_admin.dto.mapper.GroupDtoMapper;
-import ita.softserve.course_evaluation_admin.entity.Group;
-import ita.softserve.course_evaluation_admin.entity.User;
 import ita.softserve.course_evaluation_admin.service.GroupService;
-import ita.softserve.course_evaluation_admin.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,27 +17,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/v1/admin/groups")
 public class GroupController {
     private final GroupService groupService;
-    private final UserService userService;
 
-    public GroupController(GroupService groupService, UserService userService) {
+    public GroupController(GroupService groupService) {
         this.groupService = groupService;
-        this.userService = userService;
     }
 
     @GetMapping
     public ResponseEntity<List<GroupDto>> getAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(GroupDtoMapper.toDto(groupService.findAll()));
+        return ResponseEntity.status(HttpStatus.OK).body(groupService.findAllUserDto());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GroupDto> getById(@PathVariable long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(GroupDtoMapper.toDto(groupService.findById(id)));
+        return ResponseEntity.status(HttpStatus.OK).body(groupService.findGroupDtoById(id));
     }
 
     @PostMapping
@@ -49,34 +43,21 @@ public class GroupController {
 
     }
 
-    @PatchMapping("/add-students")
-    public ResponseEntity<GroupDto> addStudents(@RequestBody GroupDto dto) {
-        final Group groupFound = groupService.findById(dto.getId());
-        final List<User> usersFound = dto.getStudents()
-                .stream()
-                .map(UserDto::getId)
-                .map(userService::findById)
-                .collect(Collectors.toList());
+    @PatchMapping("/{id}/add-students")
+    public ResponseEntity<GroupDto> addStudents(@PathVariable long id, @RequestBody List<UserDto> users) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(GroupDtoMapper.toDto(groupService.addStudents(groupFound, usersFound)));
+                .body(GroupDtoMapper.toDto(groupService.addStudents(id, users)));
     }
 
-    @PatchMapping("/remove-students")
-    public ResponseEntity<GroupDto> removeStudents(@RequestBody GroupDto dto) {
-        final Group groupFound = groupService.findById(dto.getId());
-        final List<User> usersFound = dto.getStudents()
-                .stream()
-                .map(UserDto::getId)
-                .map(userService::findById)
-                .collect(Collectors.toList());
+    @PatchMapping("/{id}/remove-students")
+    public ResponseEntity<GroupDto> removeStudents(@PathVariable long id, @RequestBody List<UserDto> dto) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(GroupDtoMapper.toDto(groupService.removeStudents(groupFound, usersFound)));
+                .body(GroupDtoMapper.toDto(groupService.removeStudents(id, dto)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteGroup(@PathVariable long id) {
-        final Group groupFound = groupService.findById(id);
-        groupService.delete(groupFound);
+        groupService.deleteById(id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

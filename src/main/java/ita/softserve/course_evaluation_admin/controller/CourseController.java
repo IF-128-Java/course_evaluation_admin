@@ -1,6 +1,7 @@
 package ita.softserve.course_evaluation_admin.controller;
 
 import ita.softserve.course_evaluation_admin.dto.CourseDto;
+import ita.softserve.course_evaluation_admin.dto.mapper.CourseDtoMapper;
 import ita.softserve.course_evaluation_admin.service.CourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,22 +19,25 @@ import java.util.List;
 public class CourseController {
     private final CourseService courseService;
 
-    public CourseController(CourseService courseService) { this.courseService = courseService; }
+    public CourseController(CourseService courseService) {
+        this.courseService = courseService;
+    }
 
     @GetMapping
     public ResponseEntity<List<CourseDto>> getAll() {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(courseService.findAll());
+                .body(courseService.findAllCourseDto());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CourseDto> getById(@PathVariable long id) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(courseService.findById(id));
+                .body(courseService.findCourseDtoById(id));
     }
+
     @PostMapping
-    public ResponseEntity<CourseDto> createGroup(@RequestBody CourseDto dto) {
+    public ResponseEntity<CourseDto> createCourse(@RequestBody CourseDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).
-                body(courseService.create(dto));
+                body(CourseDtoMapper.toDto(courseService.create(dto)));
     }
 }

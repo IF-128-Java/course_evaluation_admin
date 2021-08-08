@@ -1,7 +1,7 @@
 package ita.softserve.course_evaluation_admin.controller;
 
 import ita.softserve.course_evaluation_admin.dto.UserDto;
-import ita.softserve.course_evaluation_admin.dto.mapper.UserDtoMapper;
+import ita.softserve.course_evaluation_admin.entity.Role;
 import ita.softserve.course_evaluation_admin.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,19 +24,26 @@ public class UserController {
         this.userService = userService;
     }
 
+
     @GetMapping
     public ResponseEntity<List<UserDto>> getAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(UserDtoMapper.toDto(userService.findAll()));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllUserDto());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> get(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(UserDtoMapper.toDto(userService.findById(id)));
+    public ResponseEntity<UserDto> getById(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findUserDtoById(id));
     }
 
     @PatchMapping("/add-roles")
     public ResponseEntity<UserDto> updateRole(@RequestBody UserDto dto) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(UserDtoMapper.toDto(userService.updateRoles(userService.findById(dto.getId()), dto.getRoles())));
+                .body(userService.updateRoles(dto.getId(), dto.getRoles()));
+    }
+
+    @GetMapping("/student-candidates")
+    public ResponseEntity<List<UserDto>> getStudentCandidates() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.findUsersDtoByRoleAndGroupIsNull(Role.ROLE_STUDENT.ordinal()));
     }
 }
