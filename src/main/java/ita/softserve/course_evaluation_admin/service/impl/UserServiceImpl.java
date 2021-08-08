@@ -7,9 +7,10 @@ import ita.softserve.course_evaluation_admin.entity.User;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
 import ita.softserve.course_evaluation_admin.repository.UserRepository;
 import ita.softserve.course_evaluation_admin.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 
 
@@ -22,8 +23,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAllUserDto() {
-        return UserDtoMapper.toDto(userRepository.findAll());
+    public Page<UserDto> findAllUserDto(Pageable pageable) {
+        return userRepository.findAll(pageable).map(UserDtoMapper::toDto);
     }
 
     @Override
