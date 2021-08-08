@@ -38,4 +38,9 @@ public class CourseServiceImpl implements CourseService {
     public Course create(CourseDto courseDto) {
         return courseRepository.save(CourseDtoMapper.fromDto(courseDto));
     }
+
+    @Override
+    public List<CourseDto> findCourseDtoByGroupId(long id) {
+        return CourseDtoMapper.toDto(courseRepository.findAllByGroupId(id));
+    }
 }

@@ -1,7 +1,6 @@
 package ita.softserve.course_evaluation_admin.controller;
 
 import ita.softserve.course_evaluation_admin.dto.UserDto;
-import ita.softserve.course_evaluation_admin.entity.Role;
 import ita.softserve.course_evaluation_admin.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,11 +38,5 @@ public class UserController {
     public ResponseEntity<UserDto> updateRole(@RequestBody UserDto dto) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userService.updateRoles(dto.getId(), dto.getRoles()));
-    }
-
-    @GetMapping("/student-candidates")
-    public ResponseEntity<List<UserDto>> getStudentCandidates() {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(userService.findUsersDtoByRoleAndGroupIsNull(Role.ROLE_STUDENT.ordinal()));
     }
 }

@@ -1,9 +1,11 @@
 package ita.softserve.course_evaluation_admin.controller;
 
 
+import ita.softserve.course_evaluation_admin.dto.CourseDto;
 import ita.softserve.course_evaluation_admin.dto.GroupDto;
 import ita.softserve.course_evaluation_admin.dto.UserDto;
 import ita.softserve.course_evaluation_admin.dto.mapper.GroupDtoMapper;
+import ita.softserve.course_evaluation_admin.service.CourseService;
 import ita.softserve.course_evaluation_admin.service.GroupService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +24,11 @@ import java.util.List;
 @RequestMapping("api/v1/admin/groups")
 public class GroupController {
     private final GroupService groupService;
+    private final CourseService courseService;
 
-    public GroupController(GroupService groupService) {
+    public GroupController(GroupService groupService, CourseService courseService) {
         this.groupService = groupService;
+        this.courseService = courseService;
     }
 
     @GetMapping
@@ -36,7 +40,10 @@ public class GroupController {
     public ResponseEntity<GroupDto> getById(@PathVariable long id) {
         return ResponseEntity.status(HttpStatus.OK).body(groupService.findGroupDtoById(id));
     }
-
+    @GetMapping("/{id}/courses")
+    public ResponseEntity<List<CourseDto>> getCoursesByGroupId(@PathVariable long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.findCourseDtoByGroupId(id));
+    }
     @PostMapping
     public ResponseEntity<GroupDto> createGroup(@RequestBody String groupName) {
         return ResponseEntity.status(HttpStatus.CREATED).body(GroupDtoMapper.toDto(groupService.create(groupName)));
