@@ -14,7 +14,5 @@ public interface UserService {
 
     UserDto updateRoles(long userId, Set<Role> roles);
 
-    List<UserDto> findUsersDtoByRoleAndGroupIsNull(int roleOrdinal);
-
     UserDto findUserDtoById(long id);
 }

@@ -40,12 +40,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findUsersDtoByRoleAndGroupIsNull(int roleOrdinal) {
-        return UserDtoMapper.toDto(userRepository
-                .findUsersByRoleAndGroupIsNull(roleOrdinal));
-    }
-
-    @Override
     public UserDto findUserDtoById(long id) {
         return UserDtoMapper.toDto(findById(id));
     }
