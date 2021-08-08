@@ -9,6 +9,8 @@ import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdExcepti
 import ita.softserve.course_evaluation_admin.repository.GroupRepository;
 import ita.softserve.course_evaluation_admin.service.GroupService;
 import ita.softserve.course_evaluation_admin.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,8 +28,8 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<GroupDto> findAllUserDto() {
-        return GroupDtoMapper.toDto(groupRepository.findAll());
+    public Page<GroupDto> findAllGroupDto(Pageable pageable) {
+        return groupRepository.findAll(pageable).map(GroupDtoMapper::toDto);
     }
 
     @Override

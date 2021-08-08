@@ -4,6 +4,8 @@ import ita.softserve.course_evaluation_admin.dto.StudentDto;
 import ita.softserve.course_evaluation_admin.dto.mapper.StudentDtoMapper;
 import ita.softserve.course_evaluation_admin.repository.UserRepository;
 import ita.softserve.course_evaluation_admin.service.StudentService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,8 +24,8 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<StudentDto> findAllStudents(int roleOrdinal) {
-        return StudentDtoMapper.toDto(userRepository
-                .findAllByRoleId(roleOrdinal));
+    public Page<StudentDto> findAllStudents(int roleOrdinal, Pageable pageable) {
+        return userRepository
+                .findAllByRoleId(roleOrdinal,pageable).map(StudentDtoMapper::toDto);
     }
 }
