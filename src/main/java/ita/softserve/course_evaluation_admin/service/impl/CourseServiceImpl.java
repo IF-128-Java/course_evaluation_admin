@@ -3,11 +3,11 @@ package ita.softserve.course_evaluation_admin.service.impl;
 import ita.softserve.course_evaluation_admin.dto.CourseDto;
 import ita.softserve.course_evaluation_admin.dto.mapper.CourseDtoMapper;
 import ita.softserve.course_evaluation_admin.entity.Course;
-import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
 import ita.softserve.course_evaluation_admin.repository.CourseRepository;
 import ita.softserve.course_evaluation_admin.service.CourseService;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
@@ -31,7 +31,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Course findById(long id) {
         return courseRepository.findById(id)
-                .orElseThrow(() -> new WrongIdException("The course does not exist by this id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("The course does not exist by this id: " + id));
     }
 
     @Override

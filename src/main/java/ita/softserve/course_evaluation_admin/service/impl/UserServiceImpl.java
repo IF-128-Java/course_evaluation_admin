@@ -4,13 +4,13 @@ import ita.softserve.course_evaluation_admin.dto.UserDto;
 import ita.softserve.course_evaluation_admin.dto.mapper.UserDtoMapper;
 import ita.softserve.course_evaluation_admin.entity.Role;
 import ita.softserve.course_evaluation_admin.entity.User;
-import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
 import ita.softserve.course_evaluation_admin.repository.UserRepository;
 import ita.softserve.course_evaluation_admin.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Set;
 
 
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findById(long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new WrongIdException("The user does not exist by this id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("The user does not exist by this id: " + id));
     }
 
     @Override
