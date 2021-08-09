@@ -3,7 +3,9 @@ package ita.softserve.course_evaluation_admin.entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,6 +26,8 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = {"students", "courses"})
+@ToString(exclude = {"students", "courses"})
 @Builder
 @Table(name = "groups")
 public class Group {
