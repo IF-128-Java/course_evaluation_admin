@@ -1,6 +1,6 @@
 package ita.softserve.course_evaluation_admin.security.jwt;
 
-import ita.softserve.course_evaluation_admin.exception.exceptions.JwtAuthenticationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -11,9 +11,9 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class JwtFilter extends GenericFilterBean {
     private final JwtUtils jwtUtils;
@@ -32,10 +32,9 @@ public class JwtFilter extends GenericFilterBean {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
-        } catch (JwtAuthenticationException e) {
+        } catch (Exception e) {
             SecurityContextHolder.clearContext();
-            ((HttpServletResponse) servletResponse).sendError(e.getStatus().value());
-            throw new JwtAuthenticationException("JWT token is expired or invalid");
+            log.info("Cannot set user authentication");
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }
