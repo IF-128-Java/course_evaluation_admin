@@ -1,5 +1,7 @@
 package ita.softserve.course_evaluation_admin.configuration;
 
+import ita.softserve.course_evaluation_admin.exception.handler.RestAccessDeniedHandler;
+import ita.softserve.course_evaluation_admin.exception.handler.RestAuthenticationEntryPoint;
 import ita.softserve.course_evaluation_admin.security.jwt.JwtConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +34,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .anyRequest().hasAuthority("UPDATE")
                 .and()
-                .apply(jwtConfigurer);
+                .apply(jwtConfigurer)
+                .and()
+                .exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler())
+                .authenticationEntryPoint(authenticationEntryPoint());
     }
 
     @Bean
@@ -44,5 +50,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     protected PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
+    }
+
+    @Bean
+    RestAuthenticationEntryPoint authenticationEntryPoint() {
+        return new RestAuthenticationEntryPoint();
+    }
+
+    @Bean
+    RestAccessDeniedHandler accessDeniedHandler() {
+        return new RestAccessDeniedHandler();
     }
 }

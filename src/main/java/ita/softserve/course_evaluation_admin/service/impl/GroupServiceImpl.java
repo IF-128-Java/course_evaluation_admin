@@ -5,6 +5,7 @@ import ita.softserve.course_evaluation_admin.dto.UserDto;
 import ita.softserve.course_evaluation_admin.dto.mapper.GroupDtoMapper;
 import ita.softserve.course_evaluation_admin.entity.Group;
 import ita.softserve.course_evaluation_admin.entity.User;
+import ita.softserve.course_evaluation_admin.exception.exceptions.NotEmptyGroupException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
 import ita.softserve.course_evaluation_admin.repository.GroupRepository;
 import ita.softserve.course_evaluation_admin.service.GroupService;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,7 +37,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group findById(long id) {
         return groupRepository.findById(id)
-                .orElseThrow(() -> new WrongIdException("The group does not exist by this id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("The group does not exist by this id: " + id));
     }
 
     @Override
@@ -47,7 +49,7 @@ public class GroupServiceImpl implements GroupService {
     public void deleteById(long id) {
         final Group foundGroup = findById(id);
         if (!foundGroup.getStudents().isEmpty()) {
-            throw new WrongIdException("The list of students is not empty in the group with id: " + foundGroup.getId());
+            throw new NotEmptyGroupException("The list of students is not empty in the group with id: " + foundGroup.getId());
         }
         groupRepository.deleteById(id);
     }
