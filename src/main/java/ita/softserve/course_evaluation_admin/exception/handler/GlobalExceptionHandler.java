@@ -49,4 +49,3 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(dto, HttpStatus.BAD_REQUEST);
     }
 }
-
