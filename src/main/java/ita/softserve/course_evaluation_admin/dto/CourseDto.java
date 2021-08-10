@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class CourseDto {
-    private long id;
+    private Long id;
     private String courseName;
     private String description;
     private LocalDateTime startDate;
