@@ -5,6 +5,7 @@ import ita.softserve.course_evaluation_admin.dto.mapper.CourseDtoMapper;
 import ita.softserve.course_evaluation_admin.service.CourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -36,7 +38,8 @@ public class CourseController {
     }
 
     @PostMapping
-    public ResponseEntity<CourseDto> createCourse(@RequestBody CourseDto dto) {
+    public ResponseEntity<CourseDto> createCourse(@Valid @RequestBody  CourseDto dto) {
+
         return ResponseEntity.status(HttpStatus.CREATED).
                 body(CourseDtoMapper.toDto(courseService.create(dto)));
     }
