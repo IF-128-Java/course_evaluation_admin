@@ -49,4 +49,9 @@ public class CourseServiceImpl implements CourseService {
     public List<CourseDto> findCourseDtoByGroupId(long id) {
         return CourseDtoMapper.toDto(courseRepository.findAllByGroupId(id));
     }
+
+    @Override
+    public List<CourseDto> findAllByFilterAndExcludeGroup(long excludeGroupId, String filter) {
+        return CourseDtoMapper.toDto(courseRepository.findAllByFilterAndExcludeGroup(excludeGroupId, filter));
+    }
 }

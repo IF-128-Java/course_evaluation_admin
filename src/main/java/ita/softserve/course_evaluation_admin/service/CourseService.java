@@ -15,4 +15,6 @@ public interface CourseService {
     Course create(CourseDto courseDto);
 
     List<CourseDto> findCourseDtoByGroupId(long id);
+
+    List<CourseDto> findAllByFilterAndExcludeGroup(long excludeGroupId, String filter);
 }
