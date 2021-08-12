@@ -54,9 +54,9 @@ public class GroupController {
     }
 
     @GetMapping("/{id}/available-courses")
-    public ResponseEntity<List<CourseDto>> getAvailableCoursesToAdd(@PathVariable long id, @RequestParam String filter) {
+    public ResponseEntity<Page<CourseDto>> getAvailableCoursesToAdd(@PathVariable long id, @RequestParam String filter, @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(courseService.findAllByFilterAndExcludeGroup(id, filter));
+                .body(courseService.findAllByFilterAndExcludeGroup(id, filter, PageRequest.of(page, size)));
     }
 
     @PostMapping
@@ -82,6 +82,12 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(groupService.addCourse(id, course));
     }
+    @PatchMapping("/{id}/remove-course")
+    public ResponseEntity<GroupDto> removeCourse(@PathVariable long id, @RequestBody CourseDto course) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(groupService.removeCourse(id, course));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteGroup(@PathVariable long id) {
         groupService.deleteById(id);

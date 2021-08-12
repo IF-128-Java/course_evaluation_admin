@@ -79,6 +79,16 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public GroupDto removeCourse(long id, CourseDto courseDto) {
+        Group foundGroup = findById(id);
+        Set<Course> courses = foundGroup.getCourses();
+        Course foundCourse = courseService.findById(courseDto.getId());
+        courses.remove(foundCourse);
+        foundGroup.setCourses(courses);
+        return GroupDtoMapper.toDto(groupRepository.save(foundGroup));
+    }
+
+    @Override
     public Group addStudents(long groupId, List<UserDto> studentDtos) {
         final Group groupFound = findById(groupId);
 

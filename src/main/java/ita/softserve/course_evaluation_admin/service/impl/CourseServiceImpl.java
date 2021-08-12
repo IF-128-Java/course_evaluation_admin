@@ -6,6 +6,8 @@ import ita.softserve.course_evaluation_admin.entity.Course;
 import ita.softserve.course_evaluation_admin.repository.CourseRepository;
 import ita.softserve.course_evaluation_admin.service.CourseService;
 import ita.softserve.course_evaluation_admin.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -51,7 +53,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<CourseDto> findAllByFilterAndExcludeGroup(long excludeGroupId, String filter) {
-        return CourseDtoMapper.toDto(courseRepository.findAllByFilterAndExcludeGroup(excludeGroupId, filter));
+    public Page<CourseDto> findAllByFilterAndExcludeGroup(long excludeGroupId, String filter, Pageable pageable) {
+        return courseRepository.findAllByFilterAndExcludeGroup(excludeGroupId, filter, pageable).map(CourseDtoMapper::toDto);
     }
 }

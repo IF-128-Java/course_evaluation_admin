@@ -25,4 +25,6 @@ public interface GroupService {
     Group create(String userName);
 
     GroupDto addCourse(long id, CourseDto course);
+
+    GroupDto removeCourse(long id, CourseDto course);
 }
