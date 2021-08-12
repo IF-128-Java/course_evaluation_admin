@@ -5,6 +5,7 @@ import ita.softserve.course_evaluation_admin.dto.mapper.CourseDtoMapper;
 import ita.softserve.course_evaluation_admin.entity.Course;
 import ita.softserve.course_evaluation_admin.repository.CourseRepository;
 import ita.softserve.course_evaluation_admin.service.CourseService;
+import ita.softserve.course_evaluation_admin.service.UserService;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -12,10 +13,13 @@ import java.util.List;
 
 @Service
 public class CourseServiceImpl implements CourseService {
-    private final CourseRepository courseRepository;
 
-    public CourseServiceImpl(CourseRepository courseRepository) {
+    private final CourseRepository courseRepository;
+    private final UserService userService;
+
+    public CourseServiceImpl(CourseRepository courseRepository, UserService userService) {
         this.courseRepository = courseRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -36,7 +40,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course create(CourseDto courseDto) {
-        return courseRepository.save(CourseDtoMapper.fromDto(courseDto));
+        Course course = CourseDtoMapper.fromDto(courseDto);
+        course.setTeacher(userService.findById(courseDto.getTeacherDto().getId()));
+        return courseRepository.save(course);
     }
 
     @Override

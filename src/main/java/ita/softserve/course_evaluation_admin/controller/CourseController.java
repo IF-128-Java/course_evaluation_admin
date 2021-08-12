@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -36,7 +37,8 @@ public class CourseController {
     }
 
     @PostMapping
-    public ResponseEntity<CourseDto> createCourse(@RequestBody CourseDto dto) {
+    public ResponseEntity<CourseDto> createCourse(@Valid @RequestBody  CourseDto dto) {
+
         return ResponseEntity.status(HttpStatus.CREATED).
                 body(CourseDtoMapper.toDto(courseService.create(dto)));
     }
