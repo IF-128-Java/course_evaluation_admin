@@ -37,8 +37,7 @@ public class CourseController {
     }
 
     @PostMapping
-    public ResponseEntity<CourseDto> createCourse(@Valid @RequestBody  CourseDto dto) {
-
+    public ResponseEntity<CourseDto> createCourse(@Valid @RequestBody CourseDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).
                 body(CourseDtoMapper.toDto(courseService.create(dto)));
     }

@@ -14,12 +14,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "SELECT * FROM users u WHERE u.email = ?1", nativeQuery = true)
     Optional<User> findByEmail(String email);
 
-    @Query(value = "SELECT u.id AS id, u.first_name AS first_name, u.last_name AS last_name" +
+    @Query(value = "SELECT u.id, u.first_name, u.last_name" +
             ", u.password AS password, u.email AS email, u.group_id  AS group_id  FROM users u INNER JOIN user_roles ur ON u.id = ur.user_id WHERE ur.role_id = ?1 AND u.group_id IS NULL", nativeQuery = true)
     List<User> findUsersByRoleIdAndGroupIsNull(int roleOrdinal);
 
-    @Query(value = "SELECT u.id AS id, u.first_name AS first_name, u.last_name AS last_name" +
-            ", u.password AS password, u.email AS email, u.group_id  AS group_id  FROM users u INNER JOIN user_roles ur ON u.id = ur.user_id WHERE ur.role_id = ?1 ORDER BY u.group_id"
+    @Query(value = "SELECT u.id, u.first_name, u.last_name" +
+            ", u.password, u.email, u.group_id  FROM users u INNER JOIN user_roles ur ON u.id = ur.user_id WHERE ur.role_id = ?1 ORDER BY u.group_id"
             , countQuery = "SELECT count(*) FROM users u INNER JOIN user_roles ur ON u.id = ur.user_id WHERE ur.role_id = ?1"
             , nativeQuery = true)
     Page<User> findAllByRoleId(int roleOrdinal, Pageable pageable);

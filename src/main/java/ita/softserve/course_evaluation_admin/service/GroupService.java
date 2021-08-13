@@ -1,5 +1,6 @@
 package ita.softserve.course_evaluation_admin.service;
 
+import ita.softserve.course_evaluation_admin.dto.CourseDto;
 import ita.softserve.course_evaluation_admin.dto.GroupDto;
 import ita.softserve.course_evaluation_admin.dto.UserDto;
 import ita.softserve.course_evaluation_admin.entity.Group;
@@ -22,4 +23,8 @@ public interface GroupService {
     void deleteById(long id);
 
     Group create(String userName);
+
+    GroupDto addCourse(long id, CourseDto course);
+
+    GroupDto removeCourse(long id, CourseDto course);
 }

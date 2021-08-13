@@ -40,19 +40,27 @@ public class GroupController {
 
     @GetMapping
     public ResponseEntity<Page<GroupDto>> getAll(@RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.status(HttpStatus.OK).body(groupService.findAllGroupDto(PageRequest.of(page,size)));
+        return ResponseEntity.status(HttpStatus.OK).body(groupService.findAllGroupDto(PageRequest.of(page, size)));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GroupDto> getById(@PathVariable long id) {
         return ResponseEntity.status(HttpStatus.OK).body(groupService.findGroupDtoById(id));
     }
+
     @GetMapping("/{id}/courses")
     public ResponseEntity<List<CourseDto>> getCoursesByGroupId(@PathVariable long id) {
         return ResponseEntity.status(HttpStatus.OK).body(courseService.findCourseDtoByGroupId(id));
     }
+
+    @GetMapping("/{id}/available-courses")
+    public ResponseEntity<Page<CourseDto>> getAvailableCoursesToAdd(@PathVariable long id, @RequestParam String filter, @RequestParam int page, @RequestParam int size) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(courseService.findAllByFilterAndExcludeGroup(id, filter, PageRequest.of(page, size)));
+    }
+
     @PostMapping
-    public ResponseEntity<GroupDto> createGroup(@RequestBody @NotBlank(message = "Group name should be not empty") @Size(min = 3, max = 20, message = "Group name must be between 3 and 20")  String groupName) {
+    public ResponseEntity<GroupDto> createGroup(@RequestBody @NotBlank(message = "Group name should be not empty") @Size(min = 3, max = 20, message = "Group name must be between 3 and 20") String groupName) {
         return ResponseEntity.status(HttpStatus.CREATED).body(GroupDtoMapper.toDto(groupService.create(groupName)));
 
     }
@@ -67,6 +75,17 @@ public class GroupController {
     public ResponseEntity<GroupDto> removeStudents(@PathVariable long id, @RequestBody List<UserDto> dto) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(GroupDtoMapper.toDto(groupService.removeStudents(id, dto)));
+    }
+
+    @PatchMapping("/{id}/add-course")
+    public ResponseEntity<GroupDto> addCourse(@PathVariable long id, @RequestBody CourseDto course) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(groupService.addCourse(id, course));
+    }
+    @PatchMapping("/{id}/remove-course")
+    public ResponseEntity<GroupDto> removeCourse(@PathVariable long id, @RequestBody CourseDto course) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(groupService.removeCourse(id, course));
     }
 
     @DeleteMapping("/{id}")
