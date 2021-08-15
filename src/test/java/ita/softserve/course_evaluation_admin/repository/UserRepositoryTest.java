@@ -80,20 +80,21 @@ class UserRepositoryTest {
     }
 
     @Test
+
     void findUsersByRoleIdAndGroupIsNull() {
-        Group group = groupRepository.save(Group.builder().groupName("Java").build());
-        leon.setGroup(group);
+      Group group = groupRepository.save(Group.builder().groupName("Java").build());
+      leon.setGroup(group);
 
-        userRepository.save(mike);
-        userRepository.save(leon);
-        userRepository.save(tony);
-        group.setStudents(List.of(mike));
+      userRepository.save(mike);
+      userRepository.save(leon);
+      userRepository.save(tony);
+      group.setStudents(List.of(mike));
 
-        List<User> students = userRepository.findUsersByRoleIdAndGroupIsNull(Role.ROLE_STUDENT.ordinal());
+         Page<User> actual = userRepository.findUsersByRoleIdAndGroupIsNull(Role.ROLE_STUDENT.ordinal(), "", pageable);
 
-        assertEquals(1, students.size());
-        assertTrue(students.contains(tony));
-        leon.setGroup(null);
+        assertEquals(1, actual.getTotalElements());
+      assertTrue(actual.get().anyMatch(e->e.equals(tony)));
+      leon.setGroup(null);
     }
 
     @Test
