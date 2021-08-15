@@ -1,6 +1,7 @@
 package ita.softserve.course_evaluation_admin.exception.handler;
 
 import ita.softserve.course_evaluation_admin.exception.dto.GenericExceptionResponse;
+import ita.softserve.course_evaluation_admin.exception.exceptions.GroupAlreadyExistException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.NotEmptyGroupException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -23,8 +24,8 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler({WrongIdException.class})
-    public ResponseEntity<GenericExceptionResponse> handleWrongIdException(WrongIdException exception) {
+    @ExceptionHandler({WrongIdException.class, GroupAlreadyExistException.class})
+    public ResponseEntity<GenericExceptionResponse> handleWrongIdException(RuntimeException exception) {
         GenericExceptionResponse dto = GenericExceptionResponse.builder()
                 .message(exception.getMessage())
                 .status(HttpStatus.BAD_REQUEST.value())
