@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 @Service
 public class StudentServiceImpl implements StudentService {
     private final UserRepository userRepository;
@@ -18,14 +17,14 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<StudentDto> findStudentsNotIncludeGroup(int roleOrdinal) {
-        return StudentDtoMapper.toDto(userRepository
-                .findUsersByRoleIdAndGroupIsNull(roleOrdinal));
+    public Page<StudentDto> findStudentsNotIncludeGroup(int roleOrdinal, String filter, Pageable pageable) {
+        return userRepository
+                .findUsersByRoleIdAndGroupIsNull(roleOrdinal, filter, pageable).map(StudentDtoMapper::toDto);
     }
 
     @Override
     public Page<StudentDto> findAllStudents(int roleOrdinal, Pageable pageable) {
         return userRepository
-                .findAllByRoleId(roleOrdinal,pageable).map(StudentDtoMapper::toDto);
+                .findAllByRoleId(roleOrdinal, pageable).map(StudentDtoMapper::toDto);
     }
 }

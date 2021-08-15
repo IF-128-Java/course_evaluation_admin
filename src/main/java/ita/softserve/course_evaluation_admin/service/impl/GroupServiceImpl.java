@@ -7,6 +7,7 @@ import ita.softserve.course_evaluation_admin.dto.mapper.GroupDtoMapper;
 import ita.softserve.course_evaluation_admin.entity.Course;
 import ita.softserve.course_evaluation_admin.entity.Group;
 import ita.softserve.course_evaluation_admin.entity.User;
+import ita.softserve.course_evaluation_admin.exception.exceptions.GroupAlreadyExistException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.NotEmptyGroupException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
 import ita.softserve.course_evaluation_admin.repository.GroupRepository;
@@ -62,6 +63,10 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group create(String groupName) {
+        groupRepository.findByName(groupName)
+                .ifPresent(g -> {
+                    throw new GroupAlreadyExistException("The group already exist by this name: " + g.getGroupName());
+                });
         return groupRepository.save(Group
                 .builder()
                 .groupName(groupName)

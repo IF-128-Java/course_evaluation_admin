@@ -24,9 +24,9 @@ public class StudentController {
     }
 
     @GetMapping("/candidates")
-    public ResponseEntity<List<StudentDto>> getStudentCandidates() {
+    public ResponseEntity<Page<StudentDto>> getStudentCandidates(@RequestParam String filter,@RequestParam int page, @RequestParam int size) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(studentService.findStudentsNotIncludeGroup(Role.ROLE_STUDENT.ordinal()));
+                .body(studentService.findStudentsNotIncludeGroup(Role.ROLE_STUDENT.ordinal(),filter,PageRequest.of(page,size)));
     }
     @GetMapping
     public ResponseEntity<Page<StudentDto>> getAllStudentsFromGroups(@RequestParam int page, @RequestParam int size) {
