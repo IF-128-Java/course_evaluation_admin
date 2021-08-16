@@ -56,4 +56,14 @@ public class CourseServiceImpl implements CourseService {
     public Page<CourseDto> findAllByFilterAndExcludeGroup(long excludeGroupId, String filter, Pageable pageable) {
         return courseRepository.findAllByFilterAndExcludeGroup(excludeGroupId, filter, pageable).map(CourseDtoMapper::toDto);
     }
+
+    @Override
+    public CourseDto editCourse(CourseDto courseDto) {
+        return CourseDtoMapper.toDto(courseRepository.save(CourseDtoMapper.fromDto(courseDto)));
+    }
+
+    @Override
+    public List<CourseDto> getByName(String courseName) {
+        return CourseDtoMapper.toDto(courseRepository.findCourseByName(courseName));
+    }
 }

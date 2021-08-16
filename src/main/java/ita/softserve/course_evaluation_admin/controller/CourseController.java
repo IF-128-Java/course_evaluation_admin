@@ -6,6 +6,7 @@ import ita.softserve.course_evaluation_admin.service.CourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,5 +41,16 @@ public class CourseController {
     public ResponseEntity<CourseDto> createCourse(@Valid @RequestBody CourseDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).
                 body(CourseDtoMapper.toDto(courseService.create(dto)));
+    }
+
+    @PatchMapping("/edit/{id}")
+    public ResponseEntity<CourseDto> updateCourse(@Valid @PathVariable long id, @RequestBody CourseDto courseDto) {
+        courseDto.setId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.editCourse(courseDto));
+    }
+
+    @GetMapping("name/{courseName}")
+    public ResponseEntity<List<CourseDto>> getCourseByName(@PathVariable String courseName) {
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.getByName(courseName));
     }
 }
