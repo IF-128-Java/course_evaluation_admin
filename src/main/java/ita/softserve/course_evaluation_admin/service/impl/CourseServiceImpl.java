@@ -66,4 +66,9 @@ public class CourseServiceImpl implements CourseService {
     public List<CourseDto> getByName(String courseName) {
         return CourseDtoMapper.toDto(courseRepository.findCourseByName(courseName));
     }
+
+    @Override
+    public void deleteById(long id) {
+        courseRepository.deleteById((id));
+    }
 }

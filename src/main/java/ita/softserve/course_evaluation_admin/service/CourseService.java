@@ -23,4 +23,6 @@ public interface CourseService {
     CourseDto editCourse(CourseDto courseDto);
 
     List<CourseDto> getByName(String courseName);
+
+    void deleteById(long id);
 }
