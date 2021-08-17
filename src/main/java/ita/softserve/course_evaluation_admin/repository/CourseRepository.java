@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -23,4 +24,8 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "(SELECT course_id AS id FROM course_group WHERE group_id = ?1)"
             , nativeQuery = true)
     Page<Course> findAllByFilterAndExcludeGroup(long excludeGroupId, String filter, Pageable pageable);
+
+    @Query(value = "SELECT c.id, course_name, description, start_date, end_date, teacher_id FROM course c " +
+            "LEFT JOIN users u ON c.teacher_id = u.id WHERE course_name LIKE %:courseName%", nativeQuery = true)
+    List<Course> findCourseByName(@Param("courseName") String courseName);
 }

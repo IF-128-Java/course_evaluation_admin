@@ -19,4 +19,8 @@ public interface CourseService {
     List<CourseDto> findCourseDtoByGroupId(long id);
 
     Page<CourseDto> findAllByFilterAndExcludeGroup(long excludeGroupId, String filter, Pageable pageable);
+
+    CourseDto editCourse(CourseDto courseDto);
+
+    List<CourseDto> getByName(String courseName);
 }
