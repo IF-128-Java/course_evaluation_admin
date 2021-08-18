@@ -31,6 +31,6 @@ public class StudentController {
     @GetMapping
     public ResponseEntity<Page<StudentDto>> getAllStudentsFromGroups(@RequestParam int page, @RequestParam int size) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(studentService.findAllStudents(Role.ROLE_STUDENT.ordinal(), PageRequest.of(page,size)));
+                .body(studentService.findAllStudents(PageRequest.of(page,size)));
     }
 }

@@ -3,9 +3,8 @@ package ita.softserve.course_evaluation_admin.repository;
 import ita.softserve.course_evaluation_admin.entity.Group;
 import ita.softserve.course_evaluation_admin.entity.Role;
 import ita.softserve.course_evaluation_admin.entity.User;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
@@ -21,12 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DataJpaTest
 class UserRepositoryTest {
     private User mike;
     private User leon;
     private User tony;
+    private Group group;
     private Pageable pageable;
 
     @Autowired
@@ -35,8 +34,8 @@ class UserRepositoryTest {
     @Autowired
     private GroupRepository groupRepository;
 
-    @BeforeAll
-    public void beforeAll() {
+    @BeforeEach
+    void beforeEach() {
 
         mike = User.builder()
                 .firstName("Mike")
@@ -62,6 +61,10 @@ class UserRepositoryTest {
                 .password("password")
                 .build();
 
+        group = Group.builder()
+                .groupName("IF128")
+                .build();
+
         pageable = PageRequest.of(0, 25);
     }
 
@@ -80,21 +83,37 @@ class UserRepositoryTest {
     }
 
     @Test
-
     void findUsersByRoleIdAndGroupIsNull() {
-      Group group = groupRepository.save(Group.builder().groupName("Java").build());
-      leon.setGroup(group);
+        Group savedGroup = groupRepository.save(group);
+        leon.setGroup(savedGroup);
 
-      userRepository.save(mike);
-      userRepository.save(leon);
-      userRepository.save(tony);
-      group.setStudents(List.of(mike));
+        userRepository.save(mike);
+        userRepository.save(leon);
+        userRepository.save(tony);
+        group.setStudents(List.of(mike));
 
-         Page<User> actual = userRepository.findUsersByRoleIdAndGroupIsNull(Role.ROLE_STUDENT.ordinal(), "", pageable);
+        List<User> studentsActual = userRepository
+                .findUsersByRoleIdAndGroupIsNull(Role.ROLE_STUDENT.ordinal(), "", pageable)
+                .getContent();
+        List<User> studentExpected = List.of(tony);
 
-        assertEquals(1, actual.getTotalElements());
-      assertTrue(actual.get().anyMatch(e->e.equals(tony)));
-      leon.setGroup(null);
+        assertEquals(studentExpected.size(), studentsActual.size());
+        assertTrue(studentsActual.contains(tony));
+    }
+
+    @Test
+    void findUsersByRoleIdAndGroupIsNullCheckFilter() {
+        userRepository.save(mike);
+        userRepository.save(leon);
+        userRepository.save(tony);
+
+        List<User> studentsActual = userRepository
+                .findUsersByRoleIdAndGroupIsNull(Role.ROLE_STUDENT.ordinal(), leon.getLastName(), pageable)
+                .getContent();
+        List<User> studentExpected = List.of(leon);
+
+        assertEquals(studentExpected.size(), studentsActual.size());
+        assertTrue(studentsActual.contains(leon));
     }
 
     @Test
@@ -103,16 +122,31 @@ class UserRepositoryTest {
         userRepository.save(leon);
         userRepository.save(tony);
 
-        Page<User> students = userRepository.findAllByRoleId(Role.ROLE_STUDENT.ordinal(), pageable);
-        Page<User> teachers = userRepository.findAllByRoleId(Role.ROLE_TEACHER.ordinal(), pageable);
+        Page<User> studentsPage = userRepository
+                .findAllByRoleId(Role.ROLE_STUDENT.ordinal(), pageable);
+        Page<User> teachersPage = userRepository
+                .findAllByRoleId(Role.ROLE_TEACHER.ordinal(), pageable);
 
-        assertEquals(2, students.getTotalElements());
-        assertEquals(1, teachers.getTotalElements());
+        List<User> studentsActual = studentsPage.getContent();
+        List<User> teachersActual = teachersPage.getContent();
+
+        List<User> studentsExpected = List.of(leon, tony);
+        List<User> teachersExpected = List.of(mike);
+
+        assertEquals(studentsExpected.size(), studentsActual.size());
+        assertEquals(teachersExpected.size(), teachersActual.size());
+
+        assertTrue(studentsActual.contains(leon));
+        assertTrue(studentsActual.contains(tony));
+        assertTrue(teachersActual.contains(mike));
     }
 
     @Test
     void findEmptyListByRoleId() {
-        Page<User> students = userRepository.findAllByRoleId(Role.ROLE_STUDENT.ordinal(), pageable);
-        assertEquals(0, students.getTotalElements());
+        long actualTotalElements = userRepository
+                .findAllByRoleId(Role.ROLE_STUDENT.ordinal(), pageable)
+                .getTotalElements();
+
+        assertEquals(0, actualTotalElements);
     }
 }
