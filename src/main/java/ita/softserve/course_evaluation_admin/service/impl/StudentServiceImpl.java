@@ -2,6 +2,7 @@ package ita.softserve.course_evaluation_admin.service.impl;
 
 import ita.softserve.course_evaluation_admin.dto.StudentDto;
 import ita.softserve.course_evaluation_admin.dto.mapper.StudentDtoMapper;
+import ita.softserve.course_evaluation_admin.entity.Role;
 import ita.softserve.course_evaluation_admin.repository.UserRepository;
 import ita.softserve.course_evaluation_admin.service.StudentService;
 import org.springframework.data.domain.Page;
@@ -23,8 +24,8 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Page<StudentDto> findAllStudents(int roleOrdinal, Pageable pageable) {
+    public Page<StudentDto> findAllStudents(Pageable pageable) {
         return userRepository
-                .findAllByRoleId(roleOrdinal, pageable).map(StudentDtoMapper::toDto);
+                .findAllByRoleId(Role.ROLE_STUDENT.ordinal(), pageable).map(StudentDtoMapper::toDto);
     }
 }
