@@ -25,8 +25,8 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<CourseDto> findAllCourseDto() {
-        return CourseDtoMapper.toDto(courseRepository.findAll());
+    public Page<CourseDto> findAllCourseDto(Pageable pageable) {
+        return courseRepository.findAll(pageable).map(CourseDtoMapper::toDto);
     }
 
     @Override
@@ -55,5 +55,24 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Page<CourseDto> findAllByFilterAndExcludeGroup(long excludeGroupId, String filter, Pageable pageable) {
         return courseRepository.findAllByFilterAndExcludeGroup(excludeGroupId, filter, pageable).map(CourseDtoMapper::toDto);
+    }
+
+    @Override
+    public CourseDto editCourse(CourseDto courseDto) {
+        return CourseDtoMapper.toDto(courseRepository.save(CourseDtoMapper.fromDto(courseDto)));
+    }
+
+    @Override
+    public List<CourseDto> getByName(String courseName) {
+        return CourseDtoMapper.toDto(courseRepository.findCourseByName(courseName));
+    }
+
+    @Override
+    public void deleteById(long id) {
+        if(!courseRepository.existsById(id)) {
+            throw new  EntityNotFoundException("The course does not exist by id: " + id);
+        }
+        courseRepository.deleteById((id));
+
     }
 }
