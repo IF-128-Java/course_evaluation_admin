@@ -4,10 +4,8 @@ import ita.softserve.course_evaluation_admin.entity.Course;
 import ita.softserve.course_evaluation_admin.entity.Group;
 import ita.softserve.course_evaluation_admin.entity.Role;
 import ita.softserve.course_evaluation_admin.entity.User;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
@@ -18,7 +16,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+
 @DataJpaTest
 class CourseRepositoryTest {
     private User teacher;
@@ -32,8 +30,8 @@ class CourseRepositoryTest {
     @Autowired
     private GroupRepository groupRepository;
 
-    @BeforeAll
-    public void beforeAll() {
+    @BeforeEach
+    void beforeEach() {
         teacher = User.builder()
                 .firstName("Mike")
                 .lastName("Wood")
@@ -53,7 +51,6 @@ class CourseRepositoryTest {
                 .groups(Set.of(group))
                 .teacher(teacher)
                 .build();
-
     }
 
 
@@ -63,11 +60,10 @@ class CourseRepositoryTest {
         groupRepository.save(group);
         courseRepository.save(course);
         group.setCourses(Set.of(course));
-
         List<Course> actual = courseRepository.findAllByGroupId(group.getId());
 
         assertTrue(actual.contains(course));
-        assertEquals(1,actual.size());
+        assertEquals(1, actual.size());
     }
 
     @Test
