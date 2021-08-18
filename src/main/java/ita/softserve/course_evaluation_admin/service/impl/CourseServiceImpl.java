@@ -66,4 +66,13 @@ public class CourseServiceImpl implements CourseService {
     public List<CourseDto> getByName(String courseName) {
         return CourseDtoMapper.toDto(courseRepository.findCourseByName(courseName));
     }
+
+    @Override
+    public void deleteById(long id) {
+        if(!courseRepository.existsById(id)) {
+            throw new  EntityNotFoundException("The course does not exist by id: " + id);
+        }
+        courseRepository.deleteById((id));
+
+    }
 }

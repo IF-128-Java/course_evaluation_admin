@@ -5,6 +5,7 @@ import ita.softserve.course_evaluation_admin.dto.mapper.CourseDtoMapper;
 import ita.softserve.course_evaluation_admin.service.CourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,5 +53,11 @@ public class CourseController {
     @GetMapping("name/{courseName}")
     public ResponseEntity<List<CourseDto>> getCourseByName(@PathVariable String courseName) {
         return ResponseEntity.status(HttpStatus.OK).body(courseService.getByName(courseName));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity.BodyBuilder deleteCourse(@PathVariable long id) {
+        courseService.deleteById(id);
+        return ResponseEntity.status(HttpStatus.OK);
     }
 }
