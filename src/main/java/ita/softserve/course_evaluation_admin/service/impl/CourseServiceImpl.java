@@ -25,8 +25,8 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<CourseDto> findAllCourseDto() {
-        return CourseDtoMapper.toDto(courseRepository.findAll());
+    public Page<CourseDto> findAllCourseDto(Pageable pageable) {
+        return courseRepository.findAll(pageable).map(CourseDtoMapper::toDto);
     }
 
     @Override
