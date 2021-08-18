@@ -3,6 +3,8 @@ package ita.softserve.course_evaluation_admin.controller;
 import ita.softserve.course_evaluation_admin.dto.CourseDto;
 import ita.softserve.course_evaluation_admin.dto.mapper.CourseDtoMapper;
 import ita.softserve.course_evaluation_admin.service.CourseService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -27,9 +30,9 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CourseDto>> getAll() {
+    public ResponseEntity<Page<CourseDto>> getAll(@RequestParam int page, @RequestParam int size) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(courseService.findAllCourseDto());
+                .body(courseService.findAllCourseDto(PageRequest.of(page, size)));
     }
 
     @GetMapping("/{id}")
