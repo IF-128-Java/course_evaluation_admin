@@ -9,6 +9,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class UserDtoMapper {
+    private UserDtoMapper() {
+    }
+
     public static UserDto toDto(User user) {
         return UserDto.builder()
                 .id(user.getId())

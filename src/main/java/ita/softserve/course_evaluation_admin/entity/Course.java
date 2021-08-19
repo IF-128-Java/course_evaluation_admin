@@ -1,6 +1,6 @@
 package ita.softserve.course_evaluation_admin.entity;
 
-import com.sun.istack.NotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,7 +35,6 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
     @Column(name = "course_name", nullable = false)
     private String courseName;
 

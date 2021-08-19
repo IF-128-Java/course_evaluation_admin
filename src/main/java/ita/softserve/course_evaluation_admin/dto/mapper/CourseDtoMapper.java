@@ -9,6 +9,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class CourseDtoMapper {
+    private CourseDtoMapper() {
+    }
+
     public static CourseDto toDto(Course course) {
         return CourseDto.builder()
                 .id(course.getId())
@@ -35,7 +38,7 @@ public class CourseDtoMapper {
         return Objects.isNull(courses) ? Collections.emptyList() : courses.stream().map(CourseDtoMapper::toDto).collect(Collectors.toList());
     }
 
-    public List<Course> fromDto(List<CourseDto> dtos) {
+    public static List<Course> fromDto(List<CourseDto> dtos) {
         return Objects.isNull(dtos) ? Collections.emptyList() : dtos.stream().map(CourseDtoMapper::fromDto).collect(Collectors.toList());
     }
 }
