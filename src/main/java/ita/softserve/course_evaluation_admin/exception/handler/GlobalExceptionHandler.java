@@ -39,11 +39,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<GenericExceptionResponse> handleEntityNotFoundException(EntityNotFoundException exception) {
         GenericExceptionResponse dto = GenericExceptionResponse.builder()
                 .message(exception.getMessage())
-                .status(HttpStatus.BAD_REQUEST.value())
+                .status(HttpStatus.NOT_FOUND.value())
                 .error(exception.getClass().getSimpleName())
                 .build();
 
-        return new ResponseEntity<>(dto, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(dto, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({NotEmptyGroupException.class})

@@ -9,6 +9,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class GroupDtoMapper {
+    private GroupDtoMapper() {
+    }
+
     public static GroupDto toDto(Group group) {
         return GroupDto.builder()
                 .id(group.getId())
@@ -29,7 +32,7 @@ public class GroupDtoMapper {
         return Objects.isNull(groups) ? Collections.emptyList() : groups.stream().map(GroupDtoMapper::toDto).collect(Collectors.toList());
     }
 
-    public List<Group> fromDto(List<GroupDto> dtos) {
+    public static List<Group> fromDto(List<GroupDto> dtos) {
         return Objects.isNull(dtos) ? Collections.emptyList() : dtos.stream().map(GroupDtoMapper::fromDto).collect(Collectors.toList());
     }
 }

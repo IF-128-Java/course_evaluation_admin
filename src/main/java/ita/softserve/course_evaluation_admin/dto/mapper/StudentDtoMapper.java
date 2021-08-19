@@ -10,6 +10,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class StudentDtoMapper {
+    private StudentDtoMapper() {
+    }
+
     public static StudentDto toDto(User user) {
         StudentDto studentDto = StudentDto.builder()
                 .userDto(UserDtoMapper.toDto(user))
@@ -34,7 +37,7 @@ public class StudentDtoMapper {
         return Objects.isNull(users) ? Collections.emptyList() : users.stream().map(StudentDtoMapper::toDto).collect(Collectors.toList());
     }
 
-    public List<User> fromDto(List<StudentDto> dtos) {
+    public static List<User> fromDto(List<StudentDto> dtos) {
         return Objects.isNull(dtos) ? Collections.emptyList() : dtos.stream().map(StudentDtoMapper::fromDto).collect(Collectors.toList());
     }
 }
