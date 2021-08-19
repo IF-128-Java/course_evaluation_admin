@@ -24,4 +24,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
             , nativeQuery = true)
     Page<User> findAllByRoleId(int roleOrdinal, Pageable pageable);
 
+    @Query(value = "SELECT u.id, u.first_name, u.last_name, u.password, u.email, u.group_id  FROM users u WHERE (CONCAT(u.first_name,' ', u.last_name) like concat('%',?1,'%'))"
+            , countQuery = "SELECT COUNT(u.id) FROM users u INNER JOIN user_roles ur ON u.id = ur.user_id WHERE (CONCAT(u.first_name,' ', u.last_name) like concat('%',?1,'%'))"
+            , nativeQuery = true)
+    Page<User> findAll(String filter, Pageable pageable);
 }

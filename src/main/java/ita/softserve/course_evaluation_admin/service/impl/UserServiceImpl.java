@@ -23,8 +23,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserDto> findAllUserDto(Pageable pageable) {
-        return userRepository.findAll(pageable).map(UserDtoMapper::toDto);
+    public Page<UserDto> findAllUserDto(String filter, Pageable pageable) {
+        return userRepository.findAll(filter,pageable).map(UserDtoMapper::toDto);
     }
 
     @Override

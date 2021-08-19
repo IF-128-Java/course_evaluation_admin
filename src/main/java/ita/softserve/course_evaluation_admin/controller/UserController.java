@@ -25,9 +25,9 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<UserDto>> getAll(@RequestParam int page, @RequestParam int size) {
+    public ResponseEntity<Page<UserDto>> getAll(@RequestParam int page, @RequestParam int size, @RequestParam String filter) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(userService.findAllUserDto(PageRequest.of(page, size)));
+                .body(userService.findAllUserDto(filter, PageRequest.of(page, size)));
     }
 
     @GetMapping("/{id}")

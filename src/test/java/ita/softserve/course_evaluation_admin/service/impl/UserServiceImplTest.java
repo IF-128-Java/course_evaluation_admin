@@ -21,6 +21,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -70,10 +71,11 @@ class UserServiceImplTest {
     @Test
     void findAllUserDto() {
         List<User> users = List.of(leon, tony, mike);
+        String filter ="name";
         Page<User> userPage = new PageImpl<>(users, pageable, users.size());
-        when(userRepository.findAll(pageable)).thenReturn(userPage);
-        userService.findAllUserDto(pageable);
-        verify(userRepository).findAll(pageable);
+        when(userRepository.findAll(filter,pageable)).thenReturn(userPage);
+        userService.findAllUserDto(filter,pageable);
+        verify(userRepository).findAll(filter,pageable);
     }
 
     @Test
