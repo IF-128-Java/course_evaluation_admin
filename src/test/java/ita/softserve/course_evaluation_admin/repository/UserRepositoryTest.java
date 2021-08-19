@@ -149,4 +149,49 @@ class UserRepositoryTest {
 
         assertEquals(0, actualTotalElements);
     }
+
+    @Test
+    void findAll() {
+        userRepository.save(mike);
+        userRepository.save(leon);
+        userRepository.save(tony);
+        String filter = "";
+        List<User> studentsActual = userRepository
+                .findAll(filter, pageable)
+                .getContent();
+        List<User> studentExpected = List.of(leon, mike, tony);
+
+        assertEquals(studentExpected.size(), studentsActual.size());
+        assertTrue(studentsActual.contains(leon));
+        assertTrue(studentsActual.contains(mike));
+        assertTrue(studentsActual.contains(tony));
+    }
+
+    @Test
+    void findAllCheckFilter() {
+        userRepository.save(mike);
+        userRepository.save(leon);
+        userRepository.save(tony);
+        String filter = "on";
+        List<User> studentsActual = userRepository
+                .findAll(filter, pageable)
+                .getContent();
+        List<User> studentExpected = List.of(leon, tony);
+
+        assertEquals(studentExpected.size(), studentsActual.size());
+        assertTrue(studentsActual.contains(leon));
+        assertTrue(studentsActual.contains(tony));
+    }
+
+    @Test
+    void findAllNotmaches() {
+        userRepository.save(mike);
+        userRepository.save(leon);
+        userRepository.save(tony);
+        String filter = "not esisting name";
+        List<User> studentsActual = userRepository
+                .findAll(filter, pageable)
+                .getContent();
+        assertTrue(studentsActual.isEmpty());
+    }
 }
