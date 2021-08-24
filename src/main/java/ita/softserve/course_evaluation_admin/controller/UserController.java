@@ -4,6 +4,7 @@ import ita.softserve.course_evaluation_admin.dto.UserDto;
 import ita.softserve.course_evaluation_admin.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,9 +26,11 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<UserDto>> getAll(@RequestParam int page, @RequestParam int size, @RequestParam String filter) {
+    public ResponseEntity<Page<UserDto>> getAll(@RequestParam int page, @RequestParam int size, @RequestParam String filter, @RequestParam String order, @RequestParam String direction) {
+        PageRequest pageRequest = PageRequest
+                .of(page, size, direction.equals("ASC") ? Sort.by(order).ascending() : Sort.by(order).descending());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(userService.findAllUserDto(filter, PageRequest.of(page, size)));
+                .body(userService.findAllUserDto(filter, pageRequest));
     }
 
     @GetMapping("/{id}")
