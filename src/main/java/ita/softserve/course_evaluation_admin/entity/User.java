@@ -57,5 +57,5 @@ public class User {
     private Group group;
 
     @OneToMany(mappedBy = "teacher")
-    private Set<Course> teach_courses;
+    private Set<Course> teachCourses;
 }
