@@ -5,6 +5,7 @@ import ita.softserve.course_evaluation_admin.dto.mapper.CourseDtoMapper;
 import ita.softserve.course_evaluation_admin.service.CourseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,9 +31,14 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CourseDto>> getAll(@RequestParam int page, @RequestParam int size) {
+    public ResponseEntity<Page<CourseDto>> getAll(@RequestParam int page, @RequestParam int size,
+                                                  @RequestParam String orderBy, @RequestParam String direction) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(courseService.findAllCourseDto(PageRequest.of(page, size)));
+                .body(courseService.findAllCourseDto(
+                        PageRequest.of(page, size,
+                        direction.equals("ASC") ?
+                        Sort.by(orderBy).ascending() :
+                        Sort.by(orderBy).descending())));
     }
 
     @GetMapping("/{id}")
