@@ -10,7 +10,7 @@ import java.util.Set;
 
 public interface UserService {
 
-    Page<UserDto> findAllUserDto(String filter, Pageable pageable );
+    Page<UserDto> findAllUserDto(String search, Integer[] roles, Pageable pageable );
 
     User findById(long id);
 

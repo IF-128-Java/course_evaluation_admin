@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -25,6 +26,7 @@ class UserRepositoryTest {
     private User mike;
     private User leon;
     private User tony;
+    private User leo;
     private Group group;
     private Pageable pageable;
 
@@ -58,6 +60,14 @@ class UserRepositoryTest {
                 .lastName("Bellew")
                 .email("Tony@com")
                 .roles(Set.of(Role.ROLE_STUDENT, Role.ROLE_ADMIN))
+                .password("password")
+                .build();
+
+        leo = User.builder()
+                .firstName("Leo")
+                .lastName("Kio")
+                .email("leo@com")
+                .roles(Collections.emptySet())
                 .password("password")
                 .build();
 
@@ -152,15 +162,15 @@ class UserRepositoryTest {
 
     @Test
     void findAll() {
-        userRepository.save(mike);
+       userRepository.save(mike);
         userRepository.save(leon);
         userRepository.save(tony);
         String filter = "";
         List<User> studentsActual = userRepository
-                .findAll(filter, pageable)
+                .findAll(filter, new Integer[]{0,1,2},pageable)
                 .getContent();
         List<User> studentExpected = List.of(leon, mike, tony);
-
+        System.out.println(studentsActual);
         assertEquals(studentExpected.size(), studentsActual.size());
         assertTrue(studentsActual.contains(leon));
         assertTrue(studentsActual.contains(mike));
@@ -168,13 +178,13 @@ class UserRepositoryTest {
     }
 
     @Test
-    void findAllCheckFilter() {
+    void findAllCheckSearch() {
         userRepository.save(mike);
         userRepository.save(leon);
         userRepository.save(tony);
         String filter = "on";
         List<User> studentsActual = userRepository
-                .findAll(filter, pageable)
+                .findAll(filter, new Integer[]{0,1,2}, pageable)
                 .getContent();
         List<User> studentExpected = List.of(leon, tony);
 
@@ -184,13 +194,97 @@ class UserRepositoryTest {
     }
 
     @Test
-    void findAllNotmaches() {
+    void findAllCheckFilterStudents() {
         userRepository.save(mike);
         userRepository.save(leon);
         userRepository.save(tony);
-        String filter = "not esisting name";
+        String filter = "";
         List<User> studentsActual = userRepository
-                .findAll(filter, pageable)
+                .findAll(filter, new Integer[]{0}, pageable)
+                .getContent();
+        List<User> studentExpected = List.of(leon, tony);
+
+        assertEquals(studentExpected.size(), studentsActual.size());
+        assertTrue(studentsActual.contains(leon));
+        assertTrue(studentsActual.contains(tony));
+    }
+    @Test
+    void findAllCheckFilterTeacher() {
+        userRepository.save(mike);
+        userRepository.save(leon);
+        userRepository.save(tony);
+        String filter = "";
+        List<User> studentsActual = userRepository
+                .findAll(filter, new Integer[]{1}, pageable)
+                .getContent();
+        List<User> studentExpected = List.of(mike);
+
+        assertEquals(studentExpected.size(), studentsActual.size());
+        assertTrue(studentsActual.contains(mike));
+    }
+    @Test
+    void findAllCheckFilterAdmin() {
+        userRepository.save(mike);
+        userRepository.save(leon);
+        userRepository.save(tony);
+        String filter = "";
+        List<User> studentsActual = userRepository
+                .findAll(filter, new Integer[]{2}, pageable)
+                .getContent();
+        List<User> studentExpected = List.of(tony);
+
+        assertEquals(studentExpected.size(), studentsActual.size());
+        assertTrue(studentsActual.contains(tony));
+    }
+    @Test
+    void findAllNotMaches() {
+        userRepository.save(mike);
+        userRepository.save(leon);
+        userRepository.save(tony);
+        String filter = "not existing name";
+        Integer[] roles = {0};
+        List<User> studentsActual = userRepository
+                .findAll(filter,roles, pageable)
+                .getContent();
+        assertTrue(studentsActual.isEmpty());
+    }
+
+    @Test
+    void findAllRoleNull() {
+        userRepository.save(mike);
+        userRepository.save(leon);
+        userRepository.save(tony);
+        userRepository.save(leo);
+        String filter = "";
+        List<User> actual = userRepository
+                .findAllRoleNull(filter, pageable)
+                .getContent();
+        List<User> expected = List.of(this.leo);
+        assertEquals(expected.size(),actual.size());
+        assertTrue(actual.contains(leo));
+    }
+    @Test
+    void findAllRoleNullAndCheckSearch() {
+        userRepository.save(mike);
+        userRepository.save(leon);
+        userRepository.save(tony);
+        userRepository.save(leo);
+        String filter = "Le";
+        List<User> actual = userRepository
+                .findAllRoleNull(filter, pageable)
+                .getContent();
+        List<User> expected = List.of(this.leo);
+        assertEquals(expected.size(),actual.size());
+        assertTrue(actual.contains(leo));
+    }
+    @Test
+    void findAllRoleNullEmpty() {
+        userRepository.save(mike);
+        userRepository.save(leon);
+        userRepository.save(tony);
+        String filter = "";
+        List<User> studentsActual = userRepository
+                .findAllRoleNull(filter, pageable)
                 .getContent();
         assertTrue(studentsActual.isEmpty());
     }

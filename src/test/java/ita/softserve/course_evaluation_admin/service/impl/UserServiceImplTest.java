@@ -21,7 +21,6 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -71,13 +70,24 @@ class UserServiceImplTest {
     @Test
     void findAllUserDto() {
         List<User> users = List.of(leon, tony, mike);
-        String filter ="name";
+        String search = "name";
+        Integer[] filter = new Integer[]{0, 1, 2};
         Page<User> userPage = new PageImpl<>(users, pageable, users.size());
-        when(userRepository.findAll(filter,pageable)).thenReturn(userPage);
-        userService.findAllUserDto(filter,pageable);
-        verify(userRepository).findAll(filter,pageable);
+        when(userRepository.findAll(search, filter, pageable)).thenReturn(userPage);
+        userService.findAllUserDto(search, filter, pageable);
+        verify(userRepository).findAll(search, filter, pageable);
     }
-
+    @Test
+    void findAllUserDtoFilterIsEmpty() {
+        List<User> users = List.of(leon, tony, mike);
+        String search = "name";
+        Integer[] filter = new Integer[]{};
+        Page<User> userPage = new PageImpl<>(users, pageable, users.size());
+        when(userRepository.findAllRoleNull(search, pageable)).thenReturn(userPage);
+        userService.findAllUserDto(search, filter, pageable);
+        verify(userRepository,never()).findAll(search, filter, pageable);
+        verify(userRepository).findAllRoleNull(search, pageable);
+    }
     @Test
     void updateRoles() {
         mike.setId(2L);
@@ -95,7 +105,7 @@ class UserServiceImplTest {
         Set<Role> roles = Set.of(Role.ROLE_STUDENT, Role.ROLE_TEACHER);
         EntityNotFoundException actual = assertThrows(EntityNotFoundException.class, () -> userService.updateRoles(id, roles));
         verify(userRepository, never()).save(mike);
-        assertEquals( "The user does not exist by this id: " + id,actual.getMessage());
+        assertEquals("The user does not exist by this id: " + id, actual.getMessage());
     }
 
     @Test

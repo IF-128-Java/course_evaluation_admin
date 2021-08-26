@@ -24,8 +24,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
             , nativeQuery = true)
     Page<User> findAllByRoleId(int roleOrdinal, Pageable pageable);
 
-    @Query(value = "SELECT u.id, u.first_name, u.last_name, u.password, u.email, u.group_id  FROM users u WHERE (CONCAT(u.first_name,' ', u.last_name) like concat('%',?1,'%'))"
-            , countQuery = "SELECT COUNT(u.id) FROM users u WHERE (CONCAT(u.first_name,' ', u.last_name) like concat('%',?1,'%'))"
+    @Query(value = "SELECT DISTINCT u.id, u.first_name, u.last_name, u.password, u.email, u.group_id  FROM users u " +
+            "LEFT JOIN user_roles r ON u.id = r.user_id WHERE (CONCAT(u.first_name,' ', u.last_name) like concat('%',:search,'%')) " +
+            "AND r.role_id IN (:roles) "
+            , countQuery = "SELECT COUNT(DISTINCT u.id) FROM users u LEFT JOIN user_roles r ON u.id = r.user_id WHERE (CONCAT(u.first_name,' ', u.last_name) like concat('%',:search,'%')) AND r.role_id in (:roles)"
             , nativeQuery = true)
-    Page<User> findAll(String filter, Pageable pageable);
+    Page<User> findAll(String search, Integer[] roles, Pageable pageable);
+
+    @Query(value = "SELECT u.id, u.first_name, u.last_name, u.password, u.email, u.group_id  FROM users u " +
+            "LEFT JOIN user_roles r ON u.id = r.user_id WHERE (CONCAT(u.first_name,' ', u.last_name) like concat('%',:search,'%')) " +
+            "AND r.role_id IS NULL "
+            , countQuery = "SELECT COUNT(u.id) FROM users u LEFT JOIN user_roles r ON u.id = r.user_id WHERE (CONCAT(u.first_name,' ', u.last_name) like concat('%',:search,'%')) AND r.role_id IS NULL"
+            , nativeQuery = true)
+    Page<User> findAllRoleNull(String search, Pageable pageable);
 }

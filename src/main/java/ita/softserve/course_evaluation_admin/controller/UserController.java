@@ -26,11 +26,13 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<UserDto>> getAll(@RequestParam int page, @RequestParam int size, @RequestParam String filter, @RequestParam String order, @RequestParam String direction) {
+    public ResponseEntity<Page<UserDto>> getAll(@RequestParam int page, @RequestParam int size,
+                                                @RequestParam String search, @RequestParam String order
+            , @RequestParam String direction, @RequestParam Integer[] roles) {
         PageRequest pageRequest = PageRequest
                 .of(page, size, direction.equals("ASC") ? Sort.by(order).ascending() : Sort.by(order).descending());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(userService.findAllUserDto(filter, pageRequest));
+                .body(userService.findAllUserDto(search, roles, pageRequest));
     }
 
     @GetMapping("/{id}")
