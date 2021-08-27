@@ -34,8 +34,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -83,7 +86,7 @@ class GroupServiceImplTest {
                 .firstName("Leon")
                 .lastName("Spinks")
                 .email("Leon@com")
-                .roles(Set.of(Role.ROLE_STUDENT,Role.ROLE_TEACHER))
+                .roles(Set.of(Role.ROLE_STUDENT, Role.ROLE_TEACHER))
                 .password("password")
                 .build();
         pageable = PageRequest.of(0, 55);
@@ -151,6 +154,54 @@ class GroupServiceImplTest {
         when(groupRepository.save(any(Group.class))).thenReturn(any(Group.class));
         groupService.create(groupName);
         verify(groupRepository).save(any(Group.class));
+    }
+
+    @Test
+    void updateName() {
+        when(groupRepository.findById(anyLong())).thenReturn(Optional.ofNullable(if128));
+        when(groupRepository.findByName(anyString())).thenReturn(Optional.empty());
+        when(groupRepository.save(any(Group.class))).thenReturn(any(Group.class));
+        groupService.updateName(2, "testName");
+        verify(groupRepository).findById(anyLong());
+        verify(groupRepository).findByName(anyString());
+        verify(groupRepository).save(any(Group.class));
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void updateNameGroupNotFound() {
+        Long id = if128.getId();
+        when(groupRepository.findById(anyLong())).thenReturn(Optional.empty());
+        EntityNotFoundException actual = assertThrows(EntityNotFoundException.class, () -> groupService.updateName(id, "testName"));
+        assertEquals("The group does not exist by this id: " + id, actual.getMessage());
+        verify(groupRepository).findById(anyLong());
+        verify(groupRepository, never()).save(any(Group.class));
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void updateNameAlreadyExist() {
+        Long id = lv320.getId();
+        String name = if128.getGroupName();
+        when(groupRepository.findById(anyLong())).thenReturn(Optional.ofNullable(lv320));
+        when(groupRepository.findByName(anyString())).thenReturn(Optional.ofNullable(if128));
+        GroupAlreadyExistException actual = assertThrows(GroupAlreadyExistException.class, () -> groupService.updateName(id, name));
+        assertEquals("The group already exist by this name: " + name, actual.getMessage());
+        verify(groupRepository).findById(anyLong());
+        verify(groupRepository).findByName(anyString());
+        verify(groupRepository, never()).save(any(Group.class));
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void updateNameWhenNameIsNotChanged() {
+        Long id = if128.getId();
+        String name = if128.getGroupName();
+        when(groupRepository.findById(anyLong())).thenReturn(Optional.ofNullable(if128));
+        groupService.updateName(id, name);
+        verify(groupRepository).findById(id);
+        verify(groupRepository, never()).save(any(Group.class));
+        verifyNoMoreInteractions(groupRepository);
     }
 
     @Test
