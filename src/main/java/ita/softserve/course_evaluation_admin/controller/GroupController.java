@@ -62,7 +62,11 @@ public class GroupController {
     @PostMapping
     public ResponseEntity<GroupDto> createGroup(@RequestBody @NotBlank(message = "Group name should be not empty") @Size(min = 3, max = 20, message = "Group name must be between 3 and 20") String groupName) {
         return ResponseEntity.status(HttpStatus.CREATED).body(GroupDtoMapper.toDto(groupService.create(groupName)));
+    }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<GroupDto> updateGroupName(@PathVariable long id, @RequestBody @NotBlank(message = "Group name should be not empty") @Size(min = 3, max = 20, message = "Group name must be between 3 and 20") String groupName) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(GroupDtoMapper.toDto(groupService.updateName(id, groupName)));
     }
 
     @PatchMapping("/{id}/add-students")
@@ -82,6 +86,7 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(groupService.addCourse(id, course));
     }
+
     @PatchMapping("/{id}/remove-course")
     public ResponseEntity<GroupDto> removeCourse(@PathVariable long id, @RequestBody CourseDto course) {
         return ResponseEntity.status(HttpStatus.OK)
