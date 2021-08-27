@@ -67,15 +67,15 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group create(String groupName) {
-        groupRepository.findByName(groupName)
+    public Group create(String name) {
+        groupRepository.findByName(name)
                 .ifPresent(g -> {
                     throw new GroupAlreadyExistException("The group already exist by this name: " + g.getGroupName());
                 });
 
         return groupRepository.save(Group
                 .builder()
-                .groupName(groupName)
+                .groupName(name)
                 .chatRoom(
                         chatRoomService.create(
                                 ChatRoom.builder()
@@ -84,6 +84,20 @@ public class GroupServiceImpl implements GroupService {
                         )
                 )
                 .build());
+    }
+
+    @Override
+    public Group updateName(long id, String name) {
+        Group foundGroup = findById(id);
+        if (foundGroup.getGroupName().equals(name)){
+            return foundGroup;
+        }
+        groupRepository.findByName(name)
+                .ifPresent(g -> {
+                    throw new GroupAlreadyExistException("The group already exist by this name: " + g.getGroupName());
+                });
+        foundGroup.setGroupName(name);
+        return groupRepository.save(foundGroup);
     }
 
     @Override

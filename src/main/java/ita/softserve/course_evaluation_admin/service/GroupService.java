@@ -22,7 +22,9 @@ public interface GroupService {
 
     void deleteById(long id);
 
-    Group create(String userName);
+    Group create(String name);
+
+    Group updateName(long id, String name);
 
     GroupDto addCourse(long id, CourseDto course);
 
