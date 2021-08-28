@@ -4,6 +4,8 @@ import ita.softserve.course_evaluation_admin.dto.CourseDto;
 import ita.softserve.course_evaluation_admin.dto.GroupDto;
 import ita.softserve.course_evaluation_admin.dto.UserDto;
 import ita.softserve.course_evaluation_admin.dto.mapper.GroupDtoMapper;
+import ita.softserve.course_evaluation_admin.entity.ChatRoom;
+import ita.softserve.course_evaluation_admin.entity.ChatType;
 import ita.softserve.course_evaluation_admin.entity.Course;
 import ita.softserve.course_evaluation_admin.entity.Group;
 import ita.softserve.course_evaluation_admin.entity.User;
@@ -11,6 +13,7 @@ import ita.softserve.course_evaluation_admin.exception.exceptions.GroupAlreadyEx
 import ita.softserve.course_evaluation_admin.exception.exceptions.NotEmptyGroupException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
 import ita.softserve.course_evaluation_admin.repository.GroupRepository;
+import ita.softserve.course_evaluation_admin.service.ChatRoomService;
 import ita.softserve.course_evaluation_admin.service.CourseService;
 import ita.softserve.course_evaluation_admin.service.GroupService;
 import ita.softserve.course_evaluation_admin.service.UserService;
@@ -29,11 +32,13 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final UserService userService;
     private final CourseService courseService;
+    private final ChatRoomService chatRoomService;
 
-    public GroupServiceImpl(GroupRepository groupRepository, UserService userService, CourseService courseService) {
+    public GroupServiceImpl(GroupRepository groupRepository, UserService userService, CourseService courseService, ChatRoomService chatRoomService) {
         this.groupRepository = groupRepository;
         this.userService = userService;
         this.courseService = courseService;
+        this.chatRoomService = chatRoomService;
     }
 
     @Override
@@ -67,9 +72,17 @@ public class GroupServiceImpl implements GroupService {
                 .ifPresent(g -> {
                     throw new GroupAlreadyExistException("The group already exist by this name: " + g.getGroupName());
                 });
+
         return groupRepository.save(Group
                 .builder()
                 .groupName(groupName)
+                .chatRoom(
+                        chatRoomService.create(
+                                ChatRoom.builder()
+                                        .chatType(ChatType.GROUP)
+                                        .build()
+                        )
+                )
                 .build());
     }
 
