@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
         Set<Course> teachCourses = foundUser.getTeachCourses();
         if (teachCourses != null && !teachCourses.isEmpty() && !roles.contains(Role.ROLE_TEACHER)) {
             throw new UserRoleException("The user is a teacher in the course with name: " +
-                    teachCourses.stream().findFirst().get().getCourseName());
+                    teachCourses.stream().findFirst().orElseThrow().getCourseName());
         }
         foundUser.setRoles(roles);
         return UserDtoMapper.toDto(userRepository.save(foundUser));
