@@ -1,5 +1,7 @@
 package ita.softserve.course_evaluation_admin.repository;
 
+import ita.softserve.course_evaluation_admin.entity.ChatRoom;
+import ita.softserve.course_evaluation_admin.entity.ChatType;
 import ita.softserve.course_evaluation_admin.entity.Course;
 import ita.softserve.course_evaluation_admin.entity.Group;
 import ita.softserve.course_evaluation_admin.entity.Role;
@@ -22,6 +24,7 @@ class CourseRepositoryTest {
     private User teacher;
     private Group group;
     private Course course;
+    private ChatRoom chatRoom;
 
     @Autowired
     private CourseRepository courseRepository;
@@ -29,6 +32,8 @@ class CourseRepositoryTest {
     private UserRepository userRepository;
     @Autowired
     private GroupRepository groupRepository;
+    @Autowired
+    private ChatRoomRepository chatRoomRepository;
 
     @BeforeEach
     void beforeEach() {
@@ -51,12 +56,17 @@ class CourseRepositoryTest {
                 .groups(Set.of(group))
                 .teacher(teacher)
                 .build();
+
+        chatRoom = ChatRoom.builder()
+                .chatType(ChatType.GROUP)
+                .build();
     }
 
 
     @Test
     void findAllByGroupId() {
         userRepository.save(teacher);
+        group.setChatRoom(chatRoomRepository.save(chatRoom));
         groupRepository.save(group);
         courseRepository.save(course);
         group.setCourses(Set.of(course));

@@ -1,5 +1,7 @@
 package ita.softserve.course_evaluation_admin.repository;
 
+import ita.softserve.course_evaluation_admin.entity.ChatRoom;
+import ita.softserve.course_evaluation_admin.entity.ChatType;
 import ita.softserve.course_evaluation_admin.entity.Group;
 import ita.softserve.course_evaluation_admin.entity.Role;
 import ita.softserve.course_evaluation_admin.entity.User;
@@ -29,12 +31,16 @@ class UserRepositoryTest {
     private User leo;
     private Group group;
     private Pageable pageable;
+    private ChatRoom chatRoom;
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private GroupRepository groupRepository;
+
+    @Autowired
+    private ChatRoomRepository chatRoomRepository;
 
     @BeforeEach
     void beforeEach() {
@@ -76,6 +82,10 @@ class UserRepositoryTest {
                 .build();
 
         pageable = PageRequest.of(0, 25);
+
+        chatRoom = ChatRoom.builder()
+                .chatType(ChatType.GROUP)
+                .build();
     }
 
     @Test
@@ -94,6 +104,8 @@ class UserRepositoryTest {
 
     @Test
     void findUsersByRoleIdAndGroupIsNull() {
+        group.setChatRoom(chatRoomRepository.save(chatRoom));
+
         Group savedGroup = groupRepository.save(group);
         leon.setGroup(savedGroup);
 
