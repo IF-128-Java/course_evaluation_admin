@@ -3,6 +3,7 @@ package ita.softserve.course_evaluation_admin.service.impl;
 import ita.softserve.course_evaluation_admin.dto.CourseDto;
 import ita.softserve.course_evaluation_admin.dto.GroupDto;
 import ita.softserve.course_evaluation_admin.dto.mapper.CourseDtoMapper;
+import ita.softserve.course_evaluation_admin.entity.ChatRoom;
 import ita.softserve.course_evaluation_admin.entity.Course;
 import ita.softserve.course_evaluation_admin.entity.Group;
 import ita.softserve.course_evaluation_admin.entity.Role;
@@ -10,6 +11,7 @@ import ita.softserve.course_evaluation_admin.entity.User;
 import ita.softserve.course_evaluation_admin.exception.exceptions.GroupAlreadyExistException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.NotEmptyGroupException;
 import ita.softserve.course_evaluation_admin.repository.GroupRepository;
+import ita.softserve.course_evaluation_admin.service.ChatRoomService;
 import ita.softserve.course_evaluation_admin.service.CourseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,6 +56,8 @@ class GroupServiceImplTest {
     private GroupRepository groupRepository;
     @Mock
     private CourseService courseService;
+    @Mock
+    private ChatRoomService chatRoomService;
     @InjectMocks
     private GroupServiceImpl groupService;
 
@@ -153,6 +157,7 @@ class GroupServiceImplTest {
         when(groupRepository.findByName(groupName)).thenReturn(Optional.empty());
         when(groupRepository.save(any(Group.class))).thenReturn(any(Group.class));
         groupService.create(groupName);
+        verify(chatRoomService).create(any(ChatRoom.class));
         verify(groupRepository).save(any(Group.class));
     }
 
