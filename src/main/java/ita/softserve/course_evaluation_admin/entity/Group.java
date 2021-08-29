@@ -52,6 +52,6 @@ public class Group {
     private Set<Course> courses;
 
     @OneToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "chat_room_id")
+    @JoinColumn(name = "chat_room_id", nullable = false)
     private ChatRoom chatRoom;
 }
