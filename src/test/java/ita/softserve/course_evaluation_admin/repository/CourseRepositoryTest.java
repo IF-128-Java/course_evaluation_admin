@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +31,7 @@ class CourseRepositoryTest {
     private Course python;
     private PageRequest pageRequest;
     private String filter;
-    private String[] status;
+    private List<String> status;
     private ChatRoom if128chatRoom;
     private ChatRoom lv120chatRoom;
 
@@ -98,7 +99,7 @@ class CourseRepositoryTest {
 
         filter = "";
         pageRequest = PageRequest.of(0, 5);
-        status = new String[]{"ACTIVE", "COMPLETED", "EXPECTED"};
+        status = List.of("ACTIVE", "COMPLETED", "EXPECTED");
 
 
     }
@@ -134,14 +135,14 @@ class CourseRepositoryTest {
         courseRepository.save(python);
         if128.setCourses(Set.of(java, web));
         lv120.setCourses(Set.of(python));
-        status = new String[]{"ACTIVE", "COMPLETED"};
+        status = List.of("ACTIVE", "COMPLETED");
         Page<Course> actual = courseRepository.findAllByGroupId(if128.getId(), filter, pageRequest, status);
 
         assertTrue(actual.stream().anyMatch(e -> e.equals(java)));
         assertTrue(actual.stream().anyMatch(e -> e.equals(web)));
         assertEquals(2, actual.getTotalElements());
 
-        status = new String[]{"EXPECTED"};
+        status =List.of("EXPECTED");
         actual = courseRepository.findAllByGroupId(if128.getId(), filter, pageRequest, status);
         assertEquals(0, actual.getTotalElements());
 

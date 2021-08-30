@@ -53,7 +53,7 @@ public class GroupController {
     public ResponseEntity<Page<CourseDto>> getCoursesByGroupId(@PathVariable long id, @RequestParam String filter,
                                                                @RequestParam int page, @RequestParam int size,
                                                                @RequestParam String direction, @RequestParam String order,
-                                                               @RequestParam String[] status) {
+                                                               @RequestParam List<String> status) {
         return ResponseEntity.status(HttpStatus.OK).body(courseService.
                 findCourseDtoByGroupId(id, filter, PageRequest.of(page, size, direction.equals("ASC") ? Sort.by(order).ascending() : Sort.by(order).descending()), status));
     }

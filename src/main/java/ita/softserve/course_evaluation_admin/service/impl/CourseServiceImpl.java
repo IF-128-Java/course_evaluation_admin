@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -49,9 +50,9 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Page<CourseDto> findCourseDtoByGroupId(long id, String filter, Pageable pageable, String[] status) {
-        String[] upperCase = Arrays.stream(status).map(String::toUpperCase).toArray(String[]::new);
-        return courseRepository.findAllByGroupId(id, filter, pageable, upperCase).map(CourseDtoMapper::toDto);
+    public Page<CourseDto> findCourseDtoByGroupId(long id, String filter, Pageable pageable, List<String> status) {
+        status = status.stream().map(String::toUpperCase).collect(Collectors.toList());
+        return courseRepository.findAllByGroupId(id, filter, pageable, status).map(CourseDtoMapper::toDto);
     }
 
     @Override

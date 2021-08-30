@@ -31,7 +31,7 @@ class CourseServiceImplTest {
     private Course web;
     private Course python;
     private Group if128;
-    private String[] status;
+    private List<String> status;
     @Mock
     private CourseRepository courseRepository;
     @InjectMocks
@@ -77,7 +77,7 @@ class CourseServiceImplTest {
                 .groups(Set.of(if128))
                 .teacher(teacher)
                 .build();
-        status = new String[]{"ACTIVE", "COMPLETED", "EXPECTED"};
+        status = List.of("ACTIVE", "COMPLETED", "EXPECTED");
     }
 
     @Test

@@ -16,7 +16,7 @@ public interface CourseService {
 
     Course create(CourseDto courseDto);
 
-    Page<CourseDto> findCourseDtoByGroupId(long id, String filter, Pageable pageable, String[] status);
+    Page<CourseDto> findCourseDtoByGroupId(long id, String filter, Pageable pageable, List<String> status);
 
     Page<CourseDto> findAllByFilterAndExcludeGroup(long excludeGroupId, String filter, Pageable pageable);
 
