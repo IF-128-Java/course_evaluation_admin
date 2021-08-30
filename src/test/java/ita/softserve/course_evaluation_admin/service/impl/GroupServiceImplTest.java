@@ -8,6 +8,7 @@ import ita.softserve.course_evaluation_admin.entity.Course;
 import ita.softserve.course_evaluation_admin.entity.Group;
 import ita.softserve.course_evaluation_admin.entity.Role;
 import ita.softserve.course_evaluation_admin.entity.User;
+import ita.softserve.course_evaluation_admin.exception.exceptions.CourseDateException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.GroupAlreadyExistException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.NotEmptyGroupException;
 import ita.softserve.course_evaluation_admin.repository.GroupRepository;
@@ -33,6 +34,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,7 +53,9 @@ class GroupServiceImplTest {
     private GroupDto if128Dto;
     private GroupDto lv320Dto;
     private User leon;
-    private Course course;
+    private Course java;
+    private Course python;
+    private Course web;
     @Mock
     private GroupRepository groupRepository;
     @Mock
@@ -94,13 +98,31 @@ class GroupServiceImplTest {
                 .password("password")
                 .build();
         pageable = PageRequest.of(0, 55);
-        course = Course.builder()
+        java = Course.builder()
                 .id(1L)
-                .courseName("TestCourse")
+                .courseName("java")
                 .description("Description")
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now().plusDays(2L))
                 .groups(Set.of(if128))
+                .teacher(leon)
+                .build();
+        python = Course.builder()
+                .id(2L)
+                .courseName("python")
+                .description("Description")
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now().plusDays(2L))
+                .groups(Set.of(lv320))
+                .teacher(leon)
+                .build();
+        web = Course.builder()
+                .id(3L)
+                .courseName("web")
+                .description("Description")
+                .startDate(LocalDateTime.now())
+                .endDate(LocalDateTime.now().plusDays(2L))
+                .groups(Set.of(lv320))
                 .teacher(leon)
                 .build();
     }
@@ -222,21 +244,142 @@ class GroupServiceImplTest {
     void addCourse() {
         Long id = if128.getId();
         when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
-        when(courseService.findById(course.getId())).thenReturn(course);
+        when(courseService.findById(java.getId())).thenReturn(java);
         when(groupRepository.save(any(Group.class))).thenReturn(if128);
-        CourseDto courseDto = CourseDtoMapper.toDto(course);
+        CourseDto courseDto = CourseDtoMapper.toDto(java);
         groupService.addCourse(id, courseDto);
         verify(groupRepository).save(if128);
     }
-
+    @Test
+    void addCompletedCourse() {
+        Long id = if128.getId();
+        java.setStartDate(LocalDateTime.now().minusMonths(2));
+        java.setEndDate(LocalDateTime.now().minusDays(20));
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(courseService.findById(java.getId())).thenReturn(java);
+        CourseDto courseDto = CourseDtoMapper.toDto(java);
+        CourseDateException actual = assertThrows(CourseDateException.class, () -> groupService.addCourse(id, courseDto));
+        assertEquals("The selected course with name " + java.getCourseName() + " has already ended!",actual.getMessage());
+        verify(groupRepository,never()).save(if128);
+    }
+    @Test
+    void addCompletedCourseEndDateIsNow() {
+        Long id = if128.getId();
+        java.setStartDate(LocalDateTime.now().minusMonths(2));
+        java.setEndDate(LocalDateTime.now());
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(courseService.findById(java.getId())).thenReturn(java);
+        CourseDto courseDto = CourseDtoMapper.toDto(java);
+        CourseDateException actual = assertThrows(CourseDateException.class, () -> groupService.addCourse(id, courseDto));
+        assertEquals("The selected course with name " + java.getCourseName() + " has already ended!",actual.getMessage());
+        verify(groupRepository,never()).save(if128);
+    }
+    @Test
+    void addActiveCourseStartDateIsInValid() {
+        Long id = if128.getId();
+        int validDaysAfterStart = 7;
+        java.setStartDate(LocalDateTime.now().minusDays(8));
+        java.setEndDate(LocalDateTime.now().plusDays(20));
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(courseService.findById(java.getId())).thenReturn(java);
+        CourseDto courseDto = CourseDtoMapper.toDto(java);
+        CourseDateException actual = assertThrows(CourseDateException.class, () -> groupService.addCourse(id, courseDto));
+        assertEquals("The selected course with name " + java.getCourseName() + " has already started more then " + validDaysAfterStart + " days ago!",actual.getMessage());
+        verify(groupRepository,never()).save(if128);
+    }
+    @Test
+    void addActiveCourseStartDateIsValid() {
+        Long id = if128.getId();
+        int validDaysAfterStart = 7;
+        java.setStartDate(LocalDateTime.now().minusDays(validDaysAfterStart));
+        java.setEndDate(LocalDateTime.now().plusDays(20));
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(courseService.findById(python.getId())).thenReturn(python);
+        when(groupRepository.save(any(Group.class))).thenReturn(if128);
+        CourseDto courseDto = CourseDtoMapper.toDto(python);
+        groupService.addCourse(id, courseDto);
+        assertTrue(if128.getCourses().contains(python));
+        assertFalse(if128.getCourses().contains(web));
+        verify(groupRepository).save(if128);
+    }
+    @Test
+    void addExpectedCourse() {
+        Long id = if128.getId();
+        java.setStartDate(LocalDateTime.now().plusDays(1));
+        java.setEndDate(LocalDateTime.now().plusMonths(4));
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(courseService.findById(python.getId())).thenReturn(python);
+        when(groupRepository.save(any(Group.class))).thenReturn(if128);
+        CourseDto courseDto = CourseDtoMapper.toDto(python);
+        groupService.addCourse(id, courseDto);
+        assertTrue(if128.getCourses().contains(python));
+        assertFalse(if128.getCourses().contains(java));
+        assertFalse(if128.getCourses().contains(web));
+        verify(groupRepository).save(if128);
+    }
     @Test
     void removeCourse() {
         Long id = if128.getId();
         when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
-        when(courseService.findById(course.getId())).thenReturn(course);
+        when(courseService.findById(java.getId())).thenReturn(java);
         when(groupRepository.save(any(Group.class))).thenReturn(if128);
-        CourseDto courseDto = CourseDtoMapper.toDto(course);
+        CourseDto courseDto = CourseDtoMapper.toDto(java);
         groupService.removeCourse(id, courseDto);
         verify(groupRepository).save(if128);
+    }
+
+    @Test
+    void removeExpectedCourse() {
+        Long id = if128.getId();
+        Set<Course> courses = if128.getCourses();
+        courses.add(python);
+        courses.add(java);
+        if128.setCourses(courses);
+        java.setStartDate(LocalDateTime.now().plusDays(1));
+        java.setEndDate(LocalDateTime.now().plusMonths(4));
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(courseService.findById(python.getId())).thenReturn(python);
+        when(groupRepository.save(any(Group.class))).thenReturn(if128);
+        CourseDto courseDto = CourseDtoMapper.toDto(python);
+        groupService.removeCourse(id, courseDto);
+        assertFalse(if128.getCourses().contains(python));
+        assertTrue(if128.getCourses().contains(java));
+        assertFalse(if128.getCourses().contains(web));
+        verify(groupRepository).save(if128);
+    }
+
+    @Test
+    void removeActiveCourse() {
+        Long id = if128.getId();
+        Set<Course> courses = if128.getCourses();
+        courses.add(python);
+        courses.add(java);
+        if128.setCourses(courses);
+        java.setStartDate(LocalDateTime.now().minusDays(10));
+        java.setEndDate(LocalDateTime.now().plusMonths(4));
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(courseService.findById(python.getId())).thenReturn(python);
+        when(groupRepository.save(any(Group.class))).thenReturn(if128);
+        CourseDto courseDto = CourseDtoMapper.toDto(python);
+        groupService.removeCourse(id, courseDto);
+        assertFalse(if128.getCourses().contains(python));
+        assertTrue(if128.getCourses().contains(java));
+        assertFalse(if128.getCourses().contains(web));
+        verify(groupRepository).save(if128);
+    }
+    @Test
+    void removeCompletedCourses() {
+        Long id = if128.getId();
+        Set<Course> courses = if128.getCourses();
+        courses.add(python);
+        courses.add(java);
+        java.setStartDate(LocalDateTime.now().minusDays(20));
+        java.setEndDate(LocalDateTime.now().minusDays(5));
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(courseService.findById(java.getId())).thenReturn(java);
+        CourseDto courseDto = CourseDtoMapper.toDto(java);
+        CourseDateException actual = assertThrows(CourseDateException.class, () -> groupService.removeCourse(id, courseDto));
+        assertEquals("The selected course with name " + java.getCourseName() + " has already completed! You cannot delete a completed course!",actual.getMessage());
+        verify(groupRepository,never()).save(if128);
     }
 }

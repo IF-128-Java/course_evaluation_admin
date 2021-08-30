@@ -9,6 +9,7 @@ import ita.softserve.course_evaluation_admin.entity.ChatType;
 import ita.softserve.course_evaluation_admin.entity.Course;
 import ita.softserve.course_evaluation_admin.entity.Group;
 import ita.softserve.course_evaluation_admin.entity.User;
+import ita.softserve.course_evaluation_admin.exception.exceptions.CourseDateException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.GroupAlreadyExistException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.NotEmptyGroupException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
@@ -22,6 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -33,6 +36,7 @@ public class GroupServiceImpl implements GroupService {
     private final UserService userService;
     private final CourseService courseService;
     private final ChatRoomService chatRoomService;
+
 
     public GroupServiceImpl(GroupRepository groupRepository, UserService userService, CourseService courseService, ChatRoomService chatRoomService) {
         this.groupRepository = groupRepository;
@@ -89,7 +93,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group updateName(long id, String name) {
         Group foundGroup = findById(id);
-        if (foundGroup.getGroupName().equals(name)){
+        if (foundGroup.getGroupName().equals(name)) {
             return foundGroup;
         }
         groupRepository.findByName(name)
@@ -103,8 +107,15 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupDto addCourse(long id, CourseDto courseDto) {
         Group foundGroup = findById(id);
+        final int validDaysAfterStart = 7;
         Set<Course> courses = foundGroup.getCourses();
         Course foundCourse = courseService.findById(courseDto.getId());
+        if (isCourseCompleted(foundCourse)) {
+            throw new CourseDateException("The selected course with name " + foundCourse.getCourseName() + " has already ended!");
+        }
+        if (foundCourse.getStartDate().plusDays(validDaysAfterStart).truncatedTo(ChronoUnit.DAYS).isBefore(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS))) {
+            throw new CourseDateException("The selected course with name " + foundCourse.getCourseName() + " has already started more then " + validDaysAfterStart + " days ago!");
+        }
         courses.add(foundCourse);
         foundGroup.setCourses(courses);
         return GroupDtoMapper.toDto(groupRepository.save(foundGroup));
@@ -115,6 +126,9 @@ public class GroupServiceImpl implements GroupService {
         Group foundGroup = findById(id);
         Set<Course> courses = foundGroup.getCourses();
         Course foundCourse = courseService.findById(courseDto.getId());
+        if (isCourseCompleted(foundCourse)) {
+            throw new CourseDateException("The selected course with name " + foundCourse.getCourseName() + " has already completed! You cannot delete a completed course!");
+        }
         courses.remove(foundCourse);
         foundGroup.setCourses(courses);
         return GroupDtoMapper.toDto(groupRepository.save(foundGroup));
@@ -160,5 +174,9 @@ public class GroupServiceImpl implements GroupService {
                 .peek(u -> u.setGroup(null)).collect(Collectors.toList());
         groupFound.setStudents(studentList);
         return groupRepository.save(groupFound);
+    }
+
+    private boolean isCourseCompleted(Course course) {
+        return course.getEndDate().truncatedTo(ChronoUnit.DAYS).isBefore(LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS));
     }
 }

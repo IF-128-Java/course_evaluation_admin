@@ -1,6 +1,7 @@
 package ita.softserve.course_evaluation_admin.exception.handler;
 
 import ita.softserve.course_evaluation_admin.exception.dto.GenericExceptionResponse;
+import ita.softserve.course_evaluation_admin.exception.exceptions.CourseDateException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.GroupAlreadyExistException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.NotEmptyGroupException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.UserRoleException;
@@ -58,6 +59,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(dto, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler({CourseDateException.class})
+    public ResponseEntity<GenericExceptionResponse> handleCourseDateException(CourseDateException exception) {
+        GenericExceptionResponse dto = GenericExceptionResponse.builder()
+                .message(HttpStatus.BAD_REQUEST.name())
+                .error(exception.getClass().getSimpleName())
+                .build();
+
+        return new ResponseEntity<>(dto, HttpStatus.BAD_REQUEST);
+    }
     @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<GenericExceptionResponse> handleConstraintViolationFoundException(ConstraintViolationException exception) {
         GenericExceptionResponse dto = GenericExceptionResponse.builder()
