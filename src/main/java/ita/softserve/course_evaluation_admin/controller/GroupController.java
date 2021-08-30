@@ -9,6 +9,7 @@ import ita.softserve.course_evaluation_admin.service.CourseService;
 import ita.softserve.course_evaluation_admin.service.GroupService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -49,8 +50,12 @@ public class GroupController {
     }
 
     @GetMapping("/{id}/courses")
-    public ResponseEntity<List<CourseDto>> getCoursesByGroupId(@PathVariable long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(courseService.findCourseDtoByGroupId(id));
+    public ResponseEntity<Page<CourseDto>> getCoursesByGroupId(@PathVariable long id, @RequestParam String filter,
+                                                               @RequestParam int page, @RequestParam int size,
+                                                               @RequestParam String direction, @RequestParam String order,
+                                                               @RequestParam List<String> status) {
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.
+                findCourseDtoByGroupId(id, filter, PageRequest.of(page, size, direction.equals("ASC") ? Sort.by(order).ascending() : Sort.by(order).descending()), status));
     }
 
     @GetMapping("/{id}/available-courses")

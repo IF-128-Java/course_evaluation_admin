@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -48,8 +49,9 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<CourseDto> findCourseDtoByGroupId(long id) {
-        return CourseDtoMapper.toDto(courseRepository.findAllByGroupId(id));
+    public Page<CourseDto> findCourseDtoByGroupId(long id, String filter, Pageable pageable, List<String> status) {
+        status = status.stream().map(String::toUpperCase).collect(Collectors.toList());
+        return courseRepository.findAllByGroupId(id, filter, pageable, status).map(CourseDtoMapper::toDto);
     }
 
     @Override
@@ -69,8 +71,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void deleteById(long id) {
-        if(!courseRepository.existsById(id)) {
-            throw new  EntityNotFoundException("The course does not exist by id: " + id);
+        if (!courseRepository.existsById(id)) {
+            throw new EntityNotFoundException("The course does not exist by id: " + id);
         }
         courseRepository.deleteById((id));
 
