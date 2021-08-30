@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -48,8 +49,9 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<CourseDto> findCourseDtoByGroupId(long id) {
-        return CourseDtoMapper.toDto(courseRepository.findAllByGroupId(id));
+    public Page<CourseDto> findCourseDtoByGroupId(long id, String filter, Pageable pageable, String[] status) {
+        String[] upperCase = Arrays.stream(status).map(String::toUpperCase).toArray(String[]::new);
+        return courseRepository.findAllByGroupId(id, filter, pageable, upperCase).map(CourseDtoMapper::toDto);
     }
 
     @Override
@@ -69,8 +71,8 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void deleteById(long id) {
-        if(!courseRepository.existsById(id)) {
-            throw new  EntityNotFoundException("The course does not exist by id: " + id);
+        if (!courseRepository.existsById(id)) {
+            throw new EntityNotFoundException("The course does not exist by id: " + id);
         }
         courseRepository.deleteById((id));
 
