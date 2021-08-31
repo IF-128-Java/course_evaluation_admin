@@ -32,6 +32,7 @@ import org.springframework.data.domain.Pageable;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -59,6 +60,7 @@ class GroupServiceImplTest {
     private User leon;
     private User mike;
     private User nick;
+    private User joe;
     private Course java;
     private Course python;
     private Course web;
@@ -122,6 +124,14 @@ class GroupServiceImplTest {
                 .firstName("Nick")
                 .lastName("Dias")
                 .email("dias@com")
+                .roles(Set.of(Role.ROLE_STUDENT))
+                .password("password")
+                .build();
+        joe = User.builder()
+                .id(4L)
+                .firstName("Joe")
+                .lastName("Frasier")
+                .email("frasier@com")
                 .roles(Set.of(Role.ROLE_STUDENT))
                 .password("password")
                 .build();
@@ -430,25 +440,52 @@ class GroupServiceImplTest {
     }
 
     @Test
-    void addStudents() {
+    void addStudentsToEmptyGroup() {
         Long id = if128.getId();
         Long leonId = leon.getId();
         Long nickId = nick.getId();
-                List<User> users = List.of(leon, nick);
+        List<User> users = List.of(leon, nick);
         List<UserDto> userDtos = UserDtoMapper.toDto(users);
         when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
         when(userService.findById(leonId)).thenReturn(leon);
         when(userService.findById(nickId)).thenReturn(nick);
         when(groupRepository.save(any(Group.class))).thenReturn(if128);
-        groupService.addStudents(id,userDtos);
+        groupService.addStudents(id, userDtos);
         List<User> actual = if128.getStudents();
-        assertEquals(userDtos.size(),actual.size());
+        assertEquals(userDtos.size(), actual.size());
         assertTrue(actual.contains(leon));
         assertTrue(actual.contains(nick));
         assertFalse(actual.contains(mike));
         verify(groupRepository).save(if128);
         verifyNoMoreInteractions(groupRepository);
     }
+
+    @Test
+    void addStudentsToNotEmptyGroup() {
+        Long id = if128.getId();
+        Long leonId = leon.getId();
+        Long nickId = nick.getId();
+        List<User> if128Students = if128.getStudents();
+        if128Students.add(joe);
+        if128.setStudents(if128Students);
+        joe.setGroup(if128);
+        List<User> users = List.of(leon, nick);
+        List<UserDto> userDtos = UserDtoMapper.toDto(users);
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(userService.findById(leonId)).thenReturn(leon);
+        when(userService.findById(nickId)).thenReturn(nick);
+        when(groupRepository.save(any(Group.class))).thenReturn(if128);
+        groupService.addStudents(id, userDtos);
+        List<User> actual = if128.getStudents();
+        assertEquals(userDtos.size() + 1, actual.size());
+        assertTrue(actual.contains(leon));
+        assertTrue(actual.contains(nick));
+        assertTrue(actual.contains(joe));
+        assertFalse(actual.contains(mike));
+        verify(groupRepository).save(if128);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
     @Test
     void addStudentsWhenStudentIncludeInAnotherGroup() {
         Long id = if128.getId();
@@ -464,17 +501,118 @@ class GroupServiceImplTest {
         when(userService.findById(leonId)).thenReturn(leon);
         when(userService.findById(nickId)).thenReturn(nick);
         WrongIdException actual = assertThrows(WrongIdException.class, () -> groupService.addStudents(id, userDtos));
-        assertEquals("The user with id: " + leonId + " already included in the group with id: " + leon.getGroup().getId(),actual.getMessage());
-        verify(groupRepository,never()).save(if128);
+        assertEquals("The user with id: " + leonId + " already included in the group with id: " + leon.getGroup().getId(), actual.getMessage());
+        verify(groupRepository, never()).save(if128);
         verifyNoMoreInteractions(groupRepository);
     }
+
     @Test
     void addStudentsGroupNotExist() {
         long id = 2L;
         when(groupRepository.findById(anyLong())).thenReturn(Optional.empty());
-        EntityNotFoundException actual = assertThrows(EntityNotFoundException.class, () -> groupService.findById(id));
+        EntityNotFoundException actual = assertThrows(EntityNotFoundException.class, () -> groupService.removeStudents(id, Collections.emptyList()));
         verify(groupRepository).findById(id);
-        assertEquals("The group does not exist by this id: " + id, actual.getMessage());        verify(groupRepository,never()).save(if128);
+        assertEquals("The group does not exist by this id: " + id, actual.getMessage());
+        verify(groupRepository, never()).save(if128);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void addStudentsHasntRoleStudent() {
+        Long id = if128.getId();
+        Long leonId = leon.getId();
+        Long nickId = nick.getId();
+        nick.setRoles(Set.of(Role.ROLE_TEACHER));
+        List<User> users = List.of(leon, nick);
+        List<UserDto> userDtos = UserDtoMapper.toDto(users);
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(userService.findById(leonId)).thenReturn(leon);
+        when(userService.findById(nickId)).thenReturn(nick);
+        WrongIdException actual = assertThrows(WrongIdException.class, () -> groupService.addStudents(id, userDtos));
+        assertEquals("The user with id: " + nickId + " is not a student!", actual.getMessage());
+        verify(groupRepository, never()).save(if128);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void removeStudentsAll() {
+        Long id = if128.getId();
+        Long leonId = leon.getId();
+        Long nickId = nick.getId();
+        List<User> users = new ArrayList<>();
+        users.add(leon);
+        users.add(nick);
+        leon.setGroup(if128);
+        nick.setGroup(if128);
+        if128.setStudents(users);
+        List<UserDto> userDtos = UserDtoMapper.toDto(users);
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(userService.findById(leonId)).thenReturn(leon);
+        when(userService.findById(nickId)).thenReturn(nick);
+        when(groupRepository.save(any(Group.class))).thenReturn(if128);
+        groupService.removeStudents(id, userDtos);
+        List<User> actual = if128.getStudents();
+        assertEquals(0, actual.size());
+        verify(groupRepository).save(if128);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void removeStudentsOneStudent() {
+        Long id = if128.getId();
+        Long nickId = nick.getId();
+        List<User> users = new ArrayList<>();
+        users.add(leon);
+        users.add(nick);
+        leon.setGroup(if128);
+        nick.setGroup(if128);
+        if128.setStudents(users);
+        UserDto nickDto = UserDtoMapper.toDto(nick);
+        List<UserDto> userDtos = new ArrayList<>();
+        userDtos.add(nickDto);
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(userService.findById(nickId)).thenReturn(nick);
+        when(groupRepository.save(any(Group.class))).thenReturn(if128);
+        groupService.removeStudents(id, userDtos);
+        List<User> actual = if128.getStudents();
+        assertEquals(1, actual.size());
+        assertTrue(actual.contains(leon));
+        assertFalse(actual.contains(nick));
+        verify(groupRepository).save(if128);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void removeStudentsNotIncludeGroup() {
+        Long id = if128.getId();
+        Long nickId = nick.getId();
+        List<User> if128users = new ArrayList<>();
+        List<User> lv320users = new ArrayList<>();
+        if128users.add(leon);
+        lv320users.add(nick);
+        leon.setGroup(if128);
+        nick.setGroup(lv320);
+        if128.setStudents(if128users);
+        lv320.setStudents(lv320users);
+        UserDto nickDto = UserDtoMapper.toDto(nick);
+        List<UserDto> userDtos = new ArrayList<>();
+        userDtos.add(nickDto);
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(userService.findById(nickId)).thenReturn(nick);
+        WrongIdException actual = assertThrows(WrongIdException.class, () -> groupService.removeStudents(id, userDtos));
+        assertEquals("The user with id: " + nickId + " isn't included in the group!", actual.getMessage());
+        verify(groupRepository, never()).save(if128);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void removeStudentsGroupNotExist() {
+        long id = 2L;
+        when(groupRepository.findById(anyLong())).thenReturn(Optional.empty());
+        EntityNotFoundException actual = assertThrows(EntityNotFoundException.class, () -> groupService.removeStudents(id, Collections.emptyList()));
+        verify(groupRepository).findById(id);
+        assertEquals("The group does not exist by this id: " + id, actual.getMessage());
+        verify(groupRepository, never()).save(if128);
         verifyNoMoreInteractions(groupRepository);
     }
 }
