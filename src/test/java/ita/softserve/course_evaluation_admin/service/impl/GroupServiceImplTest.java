@@ -32,7 +32,6 @@ import org.springframework.data.domain.Pageable;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -509,8 +508,9 @@ class GroupServiceImplTest {
     @Test
     void addStudentsGroupNotExist() {
         long id = 2L;
+        List<UserDto> emptyList = new ArrayList<>();
         when(groupRepository.findById(anyLong())).thenReturn(Optional.empty());
-        EntityNotFoundException actual = assertThrows(EntityNotFoundException.class, () -> groupService.removeStudents(id, Collections.emptyList()));
+        EntityNotFoundException actual = assertThrows(EntityNotFoundException.class, () -> groupService.removeStudents(id, emptyList));
         verify(groupRepository).findById(id);
         assertEquals("The group does not exist by this id: " + id, actual.getMessage());
         verify(groupRepository, never()).save(if128);
@@ -609,7 +609,8 @@ class GroupServiceImplTest {
     void removeStudentsGroupNotExist() {
         long id = 2L;
         when(groupRepository.findById(anyLong())).thenReturn(Optional.empty());
-        EntityNotFoundException actual = assertThrows(EntityNotFoundException.class, () -> groupService.removeStudents(id, Collections.emptyList()));
+        List<UserDto> emptyList = new ArrayList<>();
+        EntityNotFoundException actual = assertThrows(EntityNotFoundException.class, () -> groupService.removeStudents(id, emptyList));
         verify(groupRepository).findById(id);
         assertEquals("The group does not exist by this id: " + id, actual.getMessage());
         verify(groupRepository, never()).save(if128);
