@@ -2,7 +2,9 @@ package ita.softserve.course_evaluation_admin.service.impl;
 
 import ita.softserve.course_evaluation_admin.dto.CourseDto;
 import ita.softserve.course_evaluation_admin.dto.GroupDto;
+import ita.softserve.course_evaluation_admin.dto.UserDto;
 import ita.softserve.course_evaluation_admin.dto.mapper.CourseDtoMapper;
+import ita.softserve.course_evaluation_admin.dto.mapper.UserDtoMapper;
 import ita.softserve.course_evaluation_admin.entity.ChatRoom;
 import ita.softserve.course_evaluation_admin.entity.Course;
 import ita.softserve.course_evaluation_admin.entity.Group;
@@ -11,9 +13,11 @@ import ita.softserve.course_evaluation_admin.entity.User;
 import ita.softserve.course_evaluation_admin.exception.exceptions.CourseDateException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.GroupAlreadyExistException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.NotEmptyGroupException;
+import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdException;
 import ita.softserve.course_evaluation_admin.repository.GroupRepository;
 import ita.softserve.course_evaluation_admin.service.ChatRoomService;
 import ita.softserve.course_evaluation_admin.service.CourseService;
+import ita.softserve.course_evaluation_admin.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +31,7 @@ import org.springframework.data.domain.Pageable;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +57,9 @@ class GroupServiceImplTest {
     private GroupDto if128Dto;
     private GroupDto lv320Dto;
     private User leon;
+    private User mike;
+    private User nick;
+    private User joe;
     private Course java;
     private Course python;
     private Course web;
@@ -61,40 +68,70 @@ class GroupServiceImplTest {
     @Mock
     private CourseService courseService;
     @Mock
+    private UserService userService;
+    @Mock
     private ChatRoomService chatRoomService;
     @InjectMocks
     private GroupServiceImpl groupService;
 
+
     @BeforeEach
     void setUp() {
         Set<Course> set = new HashSet<>();
+        List<User> students = new ArrayList<>();
+        List<UserDto> studentsDto = new ArrayList<>();
         if128 = Group.builder()
                 .id(1L)
                 .groupName("IF128")
                 .courses(set)
-                .students(Collections.emptyList())
+                .students(students)
                 .build();
         if128Dto = GroupDto.builder()
                 .id(1L)
                 .groupName(if128.getGroupName())
-                .students(Collections.emptyList())
+                .students(studentsDto)
                 .build();
         lv320 = Group.builder()
                 .id(2L)
                 .groupName("LV320")
-                .students(Collections.emptyList())
+                .students(students)
                 .courses(set)
                 .build();
         lv320Dto = GroupDto.builder()
                 .id(2L)
                 .groupName(lv320.getGroupName())
-                .students(Collections.emptyList())
+                .students(studentsDto)
                 .build();
         leon = User.builder()
+                .id(1L)
                 .firstName("Leon")
                 .lastName("Spinks")
                 .email("Leon@com")
                 .roles(Set.of(Role.ROLE_STUDENT, Role.ROLE_TEACHER))
+                .password("password")
+                .build();
+        mike = User.builder()
+                .id(2L)
+                .firstName("Mike")
+                .lastName("Tyson")
+                .email("mike@com")
+                .roles(Set.of(Role.ROLE_TEACHER))
+                .password("password")
+                .build();
+        nick = User.builder()
+                .id(3L)
+                .firstName("Nick")
+                .lastName("Dias")
+                .email("dias@com")
+                .roles(Set.of(Role.ROLE_STUDENT))
+                .password("password")
+                .build();
+        joe = User.builder()
+                .id(4L)
+                .firstName("Joe")
+                .lastName("Frasier")
+                .email("frasier@com")
+                .roles(Set.of(Role.ROLE_STUDENT))
                 .password("password")
                 .build();
         pageable = PageRequest.of(0, 55);
@@ -144,6 +181,17 @@ class GroupServiceImplTest {
         when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
         groupService.findById(id);
         verify(groupRepository).findById(id);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void findGroupDtoById() {
+        Long id = lv320.getId();
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(lv320));
+        GroupDto actual = groupService.findGroupDtoById(id);
+        verify(groupRepository).findById(id);
+        verifyNoMoreInteractions(groupRepository);
+        assertEquals(lv320Dto, actual);
     }
 
     @Test
@@ -250,6 +298,7 @@ class GroupServiceImplTest {
         groupService.addCourse(id, courseDto);
         verify(groupRepository).save(if128);
     }
+
     @Test
     void addCompletedCourse() {
         Long id = if128.getId();
@@ -259,9 +308,10 @@ class GroupServiceImplTest {
         when(courseService.findById(java.getId())).thenReturn(java);
         CourseDto courseDto = CourseDtoMapper.toDto(java);
         CourseDateException actual = assertThrows(CourseDateException.class, () -> groupService.addCourse(id, courseDto));
-        assertEquals("The selected course with name " + java.getCourseName() + " has already ended!",actual.getMessage());
-        verify(groupRepository,never()).save(if128);
+        assertEquals("The selected course with name " + java.getCourseName() + " has already ended!", actual.getMessage());
+        verify(groupRepository, never()).save(if128);
     }
+
     @Test
     void addCompletedCourseEndDateIsNow() {
         Long id = if128.getId();
@@ -271,9 +321,10 @@ class GroupServiceImplTest {
         when(courseService.findById(java.getId())).thenReturn(java);
         CourseDto courseDto = CourseDtoMapper.toDto(java);
         CourseDateException actual = assertThrows(CourseDateException.class, () -> groupService.addCourse(id, courseDto));
-        assertEquals("The selected course with name " + java.getCourseName() + " has already ended!",actual.getMessage());
-        verify(groupRepository,never()).save(if128);
+        assertEquals("The selected course with name " + java.getCourseName() + " has already ended!", actual.getMessage());
+        verify(groupRepository, never()).save(if128);
     }
+
     @Test
     void addActiveCourseStartDateIsInValid() {
         Long id = if128.getId();
@@ -284,9 +335,10 @@ class GroupServiceImplTest {
         when(courseService.findById(java.getId())).thenReturn(java);
         CourseDto courseDto = CourseDtoMapper.toDto(java);
         CourseDateException actual = assertThrows(CourseDateException.class, () -> groupService.addCourse(id, courseDto));
-        assertEquals("The selected course with name " + java.getCourseName() + " has already started more then " + validDaysAfterStart + " days ago!",actual.getMessage());
-        verify(groupRepository,never()).save(if128);
+        assertEquals("The selected course with name " + java.getCourseName() + " has already started more then " + validDaysAfterStart + " days ago!", actual.getMessage());
+        verify(groupRepository, never()).save(if128);
     }
+
     @Test
     void addActiveCourseStartDateIsValid() {
         Long id = if128.getId();
@@ -302,6 +354,7 @@ class GroupServiceImplTest {
         assertFalse(if128.getCourses().contains(web));
         verify(groupRepository).save(if128);
     }
+
     @Test
     void addExpectedCourse() {
         Long id = if128.getId();
@@ -317,6 +370,7 @@ class GroupServiceImplTest {
         assertFalse(if128.getCourses().contains(web));
         verify(groupRepository).save(if128);
     }
+
     @Test
     void removeCourse() {
         Long id = if128.getId();
@@ -367,6 +421,7 @@ class GroupServiceImplTest {
         assertFalse(if128.getCourses().contains(web));
         verify(groupRepository).save(if128);
     }
+
     @Test
     void removeCompletedCourses() {
         Long id = if128.getId();
@@ -379,7 +434,186 @@ class GroupServiceImplTest {
         when(courseService.findById(java.getId())).thenReturn(java);
         CourseDto courseDto = CourseDtoMapper.toDto(java);
         CourseDateException actual = assertThrows(CourseDateException.class, () -> groupService.removeCourse(id, courseDto));
-        assertEquals("The selected course with name " + java.getCourseName() + " has already completed! You cannot delete a completed course!",actual.getMessage());
-        verify(groupRepository,never()).save(if128);
+        assertEquals("The selected course with name " + java.getCourseName() + " has already completed! You cannot delete a completed course!", actual.getMessage());
+        verify(groupRepository, never()).save(if128);
+    }
+
+    @Test
+    void addStudentsToEmptyGroup() {
+        Long id = if128.getId();
+        Long leonId = leon.getId();
+        Long nickId = nick.getId();
+        List<User> users = List.of(leon, nick);
+        List<UserDto> userDtos = UserDtoMapper.toDto(users);
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(userService.findById(leonId)).thenReturn(leon);
+        when(userService.findById(nickId)).thenReturn(nick);
+        when(groupRepository.save(any(Group.class))).thenReturn(if128);
+        groupService.addStudents(id, userDtos);
+        List<User> actual = if128.getStudents();
+        assertEquals(userDtos.size(), actual.size());
+        assertTrue(actual.contains(leon));
+        assertTrue(actual.contains(nick));
+        assertFalse(actual.contains(mike));
+        verify(groupRepository).save(if128);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void addStudentsToNotEmptyGroup() {
+        Long id = if128.getId();
+        Long leonId = leon.getId();
+        Long nickId = nick.getId();
+        List<User> if128Students = if128.getStudents();
+        if128Students.add(joe);
+        if128.setStudents(if128Students);
+        joe.setGroup(if128);
+        List<User> users = List.of(leon, nick);
+        List<UserDto> userDtos = UserDtoMapper.toDto(users);
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(userService.findById(leonId)).thenReturn(leon);
+        when(userService.findById(nickId)).thenReturn(nick);
+        when(groupRepository.save(any(Group.class))).thenReturn(if128);
+        groupService.addStudents(id, userDtos);
+        List<User> actual = if128.getStudents();
+        assertEquals(userDtos.size() + 1, actual.size());
+        assertTrue(actual.contains(leon));
+        assertTrue(actual.contains(nick));
+        assertTrue(actual.contains(joe));
+        assertFalse(actual.contains(mike));
+        verify(groupRepository).save(if128);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void addStudentsWhenStudentIncludeInAnotherGroup() {
+        Long id = if128.getId();
+        Long leonId = leon.getId();
+        Long nickId = nick.getId();
+        List<User> lv320Students = lv320.getStudents();
+        lv320Students.add(leon);
+        lv320.setStudents(lv320Students);
+        leon.setGroup(lv320);
+        List<User> users = List.of(leon, nick);
+        List<UserDto> userDtos = UserDtoMapper.toDto(users);
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(userService.findById(leonId)).thenReturn(leon);
+        when(userService.findById(nickId)).thenReturn(nick);
+        WrongIdException actual = assertThrows(WrongIdException.class, () -> groupService.addStudents(id, userDtos));
+        assertEquals("The user with id: " + leonId + " already included in the group with id: " + leon.getGroup().getId(), actual.getMessage());
+        verify(groupRepository, never()).save(if128);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void addStudentsGroupNotExist() {
+        long id = 2L;
+        List<UserDto> emptyList = new ArrayList<>();
+        when(groupRepository.findById(anyLong())).thenReturn(Optional.empty());
+        EntityNotFoundException actual = assertThrows(EntityNotFoundException.class, () -> groupService.removeStudents(id, emptyList));
+        verify(groupRepository).findById(id);
+        assertEquals("The group does not exist by this id: " + id, actual.getMessage());
+        verify(groupRepository, never()).save(if128);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void addStudentsHasntRoleStudent() {
+        Long id = if128.getId();
+        Long leonId = leon.getId();
+        Long nickId = nick.getId();
+        nick.setRoles(Set.of(Role.ROLE_TEACHER));
+        List<User> users = List.of(leon, nick);
+        List<UserDto> userDtos = UserDtoMapper.toDto(users);
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(userService.findById(leonId)).thenReturn(leon);
+        when(userService.findById(nickId)).thenReturn(nick);
+        WrongIdException actual = assertThrows(WrongIdException.class, () -> groupService.addStudents(id, userDtos));
+        assertEquals("The user with id: " + nickId + " is not a student!", actual.getMessage());
+        verify(groupRepository, never()).save(if128);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void removeStudentsAll() {
+        Long id = if128.getId();
+        Long leonId = leon.getId();
+        Long nickId = nick.getId();
+        List<User> users = new ArrayList<>();
+        users.add(leon);
+        users.add(nick);
+        leon.setGroup(if128);
+        nick.setGroup(if128);
+        if128.setStudents(users);
+        List<UserDto> userDtos = UserDtoMapper.toDto(users);
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(userService.findById(leonId)).thenReturn(leon);
+        when(userService.findById(nickId)).thenReturn(nick);
+        when(groupRepository.save(any(Group.class))).thenReturn(if128);
+        groupService.removeStudents(id, userDtos);
+        List<User> actual = if128.getStudents();
+        assertEquals(0, actual.size());
+        verify(groupRepository).save(if128);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void removeStudentsOneStudent() {
+        Long id = if128.getId();
+        Long nickId = nick.getId();
+        List<User> users = new ArrayList<>();
+        users.add(leon);
+        users.add(nick);
+        leon.setGroup(if128);
+        nick.setGroup(if128);
+        if128.setStudents(users);
+        UserDto nickDto = UserDtoMapper.toDto(nick);
+        List<UserDto> userDtos = new ArrayList<>();
+        userDtos.add(nickDto);
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(userService.findById(nickId)).thenReturn(nick);
+        when(groupRepository.save(any(Group.class))).thenReturn(if128);
+        groupService.removeStudents(id, userDtos);
+        List<User> actual = if128.getStudents();
+        assertEquals(1, actual.size());
+        assertTrue(actual.contains(leon));
+        assertFalse(actual.contains(nick));
+        verify(groupRepository).save(if128);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void removeStudentsNotIncludeGroup() {
+        Long id = if128.getId();
+        Long nickId = nick.getId();
+        List<User> if128users = new ArrayList<>();
+        List<User> lv320users = new ArrayList<>();
+        if128users.add(leon);
+        lv320users.add(nick);
+        leon.setGroup(if128);
+        nick.setGroup(lv320);
+        if128.setStudents(if128users);
+        lv320.setStudents(lv320users);
+        UserDto nickDto = UserDtoMapper.toDto(nick);
+        List<UserDto> userDtos = new ArrayList<>();
+        userDtos.add(nickDto);
+        when(groupRepository.findById(id)).thenReturn(Optional.ofNullable(if128));
+        when(userService.findById(nickId)).thenReturn(nick);
+        WrongIdException actual = assertThrows(WrongIdException.class, () -> groupService.removeStudents(id, userDtos));
+        assertEquals("The user with id: " + nickId + " isn't included in the group!", actual.getMessage());
+        verify(groupRepository, never()).save(if128);
+        verifyNoMoreInteractions(groupRepository);
+    }
+
+    @Test
+    void removeStudentsGroupNotExist() {
+        long id = 2L;
+        when(groupRepository.findById(anyLong())).thenReturn(Optional.empty());
+        List<UserDto> emptyList = new ArrayList<>();
+        EntityNotFoundException actual = assertThrows(EntityNotFoundException.class, () -> groupService.removeStudents(id, emptyList));
+        verify(groupRepository).findById(id);
+        assertEquals("The group does not exist by this id: " + id, actual.getMessage());
+        verify(groupRepository, never()).save(if128);
+        verifyNoMoreInteractions(groupRepository);
     }
 }

@@ -8,6 +8,7 @@ import ita.softserve.course_evaluation_admin.entity.ChatRoom;
 import ita.softserve.course_evaluation_admin.entity.ChatType;
 import ita.softserve.course_evaluation_admin.entity.Course;
 import ita.softserve.course_evaluation_admin.entity.Group;
+import ita.softserve.course_evaluation_admin.entity.Role;
 import ita.softserve.course_evaluation_admin.entity.User;
 import ita.softserve.course_evaluation_admin.exception.exceptions.CourseDateException;
 import ita.softserve.course_evaluation_admin.exception.exceptions.GroupAlreadyExistException;
@@ -25,10 +26,12 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class GroupServiceImpl implements GroupService {
@@ -144,15 +147,19 @@ public class GroupServiceImpl implements GroupService {
                 .map(userService::findById)
                 .collect(Collectors.toList());
 
-        final Optional<User> notExpectedUser = usersFound.stream()
+        final Optional<User> userInGroup = usersFound.stream()
                 .filter(s -> s.getGroup() != null && s.getGroup().getId() != groupId).findFirst();
-        notExpectedUser.ifPresent(u -> {
+        userInGroup.ifPresent(u -> {
             throw new WrongIdException("The user with id: " + u.getId() + " already included in the group with id: " + u.getGroup().getId());
         });
-        List<User> studentList = usersFound
-                .stream()
-                .peek(u -> u.setGroup(groupFound)).collect(Collectors.toList());
-        groupFound.setStudents(studentList);
+        final Optional<User> userWithOutStudentRole = usersFound.stream()
+                .filter(s -> !s.getRoles().contains(Role.ROLE_STUDENT)).findFirst();
+        userWithOutStudentRole.ifPresent(u -> {
+            throw new WrongIdException("The user with id: " + u.getId() + " is not a student!");
+        });
+        usersFound.forEach(u -> u.setGroup(groupFound));
+        List<User> groupFoundStudents = groupFound.getStudents();
+        groupFound.setStudents(Stream.of(groupFoundStudents, usersFound).flatMap(Collection::stream).distinct().collect(Collectors.toList()));
         return groupRepository.save(groupFound);
     }
 
@@ -167,12 +174,12 @@ public class GroupServiceImpl implements GroupService {
         final Optional<User> notExpectedUser = usersFound.stream()
                 .filter(s -> s.getGroup() == null || !s.getGroup().equals(groupFound)).findFirst();
         notExpectedUser.ifPresent(u -> {
-            throw new WrongIdException("The user with id: " + u.getId() + " isn't included in the group");
+            throw new WrongIdException("The user with id: " + u.getId() + " isn't included in the group!");
         });
-        List<User> studentList = usersFound
-                .stream()
-                .peek(u -> u.setGroup(null)).collect(Collectors.toList());
-        groupFound.setStudents(studentList);
+        usersFound.forEach(u -> u.setGroup(null));
+        List<User> groupFoundStudents = groupFound.getStudents();
+        groupFoundStudents.removeAll(usersFound);
+        groupFound.setStudents(groupFoundStudents);
         return groupRepository.save(groupFound);
     }
 

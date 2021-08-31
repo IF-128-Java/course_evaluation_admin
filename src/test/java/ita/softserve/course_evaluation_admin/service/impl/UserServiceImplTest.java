@@ -25,7 +25,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -97,13 +99,28 @@ class UserServiceImplTest {
     @Test
     void updateRoles() {
         mike.setId(2L);
+        mike.setTeachCourses(Collections.emptySet());
         when(userRepository.findById(mike.getId())).thenReturn(Optional.ofNullable(mike));
         when(userRepository.save(mike)).thenReturn(mike);
         Set<Role> roles = Set.of(Role.ROLE_STUDENT, Role.ROLE_TEACHER);
         userService.updateRoles(mike.getId(), roles);
         verify(userRepository).save(mike);
     }
-
+    @Test
+    void updateRolesGroupAndTeachCourseIsNull() {
+        mike.setId(2L);
+        mike.setGroup(null);
+        mike.setTeachCourses(null);
+        when(userRepository.findById(mike.getId())).thenReturn(Optional.ofNullable(mike));
+        when(userRepository.save(mike)).thenReturn(mike);
+        Set<Role> roles = Set.of(Role.ROLE_STUDENT, Role.ROLE_TEACHER);
+        userService.updateRoles(mike.getId(), roles);
+        Set<Role> actualRoles = mike.getRoles();
+        assertTrue(actualRoles.contains(Role.ROLE_STUDENT));
+        assertTrue(actualRoles.contains(Role.ROLE_TEACHER));
+        assertFalse(actualRoles.contains(Role.ROLE_ADMIN));
+        verify(userRepository).save(mike);
+    }
 
     @Test
     void updateRolesIsEmpty() {
