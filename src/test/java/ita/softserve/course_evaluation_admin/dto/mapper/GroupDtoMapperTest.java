@@ -122,4 +122,15 @@ class GroupDtoMapperTest {
         List<GroupDto> actual = GroupDtoMapper.toDto(Collections.emptyList());
         assertTrue(actual.isEmpty());
     }
+    @Test
+    void fromDtoListIsNull() {
+        List<Group> actual = GroupDtoMapper.fromDto((List<GroupDto>) null);
+        assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    void toDtoListIsNull() {
+        List<GroupDto> actual = GroupDtoMapper.toDto((List<Group>) null);
+        assertTrue(actual.isEmpty());
+    }
 }
