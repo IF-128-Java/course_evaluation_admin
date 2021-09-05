@@ -120,4 +120,16 @@ class UserDtoMapperTest {
         List<UserDto> actual = UserDtoMapper.toDto(Collections.emptyList());
         assertTrue(actual.isEmpty());
     }
+
+    @Test
+    void fromDtListIsNul() {
+        List<User> actual = UserDtoMapper.fromDto((List<UserDto>) null);
+        assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    void toDtoListIsNull() {
+        List<UserDto> actual = UserDtoMapper.toDto((List<User>) null);
+        assertTrue(actual.isEmpty());
+    }
 }

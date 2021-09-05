@@ -142,4 +142,15 @@ class CourseDtoMapperTest {
         List<CourseDto> actual = CourseDtoMapper.toDto(Collections.emptyList());
         assertTrue(actual.isEmpty());
     }
+    @Test
+    void fromDtoListIsNull() {
+        List<Course> actual = CourseDtoMapper.fromDto((List<CourseDto>) null);
+        assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    void toDtoListIsNul() {
+        List<CourseDto> actual = CourseDtoMapper.toDto((List<Course>) null);
+        assertTrue(actual.isEmpty());
+    }
 }
