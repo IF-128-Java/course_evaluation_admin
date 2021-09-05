@@ -116,6 +116,13 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>ita/softserve/course_evaluation_admin/entity/*</exclude>
+                        <exclude>ita/softserve/course_evaluation_admin/dto/*</exclude>
+                        <exclude>**/configuration/*</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>
