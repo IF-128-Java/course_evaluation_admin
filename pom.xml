@@ -83,6 +83,12 @@
             <version>3.12.4</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <version>5.5.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -110,13 +116,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <excludes>
-                        <exclude>ita/softserve/course_evaluation_admin/entity/*</exclude>
-                        <exclude>ita/softserve/course_evaluation_admin/dto/*</exclude>
-                        <exclude>**/configuration/*</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
         </plugins>
     </build>
