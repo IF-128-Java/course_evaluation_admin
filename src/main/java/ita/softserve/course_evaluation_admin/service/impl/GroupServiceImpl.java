@@ -122,6 +122,14 @@ public class GroupServiceImpl implements GroupService {
         }
         courses.add(foundCourse);
         foundGroup.setCourses(courses);
+        foundGroup.getStudents().forEach(u ->
+                siteNotificationService.processCreateSiteNotification(
+                        "Started learning a new course!",
+                        "Hi " + u.getFirstName() + ", your \"" + foundGroup.getGroupName() + "\" group started learning \""
+                                + foundCourse.getCourseName() + "\" course!",
+                        u.getId()
+                )
+        );
         return GroupDtoMapper.toDto(groupRepository.save(foundGroup));
     }
 
@@ -135,6 +143,14 @@ public class GroupServiceImpl implements GroupService {
         }
         courses.remove(foundCourse);
         foundGroup.setCourses(courses);
+        foundGroup.getStudents().forEach(u ->
+                siteNotificationService.processCreateSiteNotification(
+                        "Stopped learning the course!",
+                        "Hi " + u.getFirstName() + ", your \"" + foundGroup.getGroupName() + "\" group stopped learning \""
+                                + foundCourse.getCourseName() + "\" course!",
+                        u.getId()
+                )
+        );
         return GroupDtoMapper.toDto(groupRepository.save(foundGroup));
     }
 
