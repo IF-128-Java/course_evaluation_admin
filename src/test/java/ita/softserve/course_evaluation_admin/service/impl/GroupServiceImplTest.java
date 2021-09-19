@@ -17,6 +17,7 @@ import ita.softserve.course_evaluation_admin.exception.exceptions.WrongIdExcepti
 import ita.softserve.course_evaluation_admin.repository.GroupRepository;
 import ita.softserve.course_evaluation_admin.service.ChatRoomService;
 import ita.softserve.course_evaluation_admin.service.CourseService;
+import ita.softserve.course_evaluation_admin.service.SiteNotificationService;
 import ita.softserve.course_evaluation_admin.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,6 +72,8 @@ class GroupServiceImplTest {
     private UserService userService;
     @Mock
     private ChatRoomService chatRoomService;
+    @Mock
+    private SiteNotificationService siteNotificationService;
     @InjectMocks
     private GroupServiceImpl groupService;
 

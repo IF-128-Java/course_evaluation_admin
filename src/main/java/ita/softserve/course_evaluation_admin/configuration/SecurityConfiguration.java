@@ -32,6 +32,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
+                .antMatchers("/api/v1/admin/connect-ws/**").permitAll()
                 .anyRequest().hasAuthority("UPDATE")
                 .and()
                 .apply(jwtConfigurer)

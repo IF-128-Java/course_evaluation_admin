@@ -18,11 +18,11 @@ import ita.softserve.course_evaluation_admin.repository.GroupRepository;
 import ita.softserve.course_evaluation_admin.service.ChatRoomService;
 import ita.softserve.course_evaluation_admin.service.CourseService;
 import ita.softserve.course_evaluation_admin.service.GroupService;
+import ita.softserve.course_evaluation_admin.service.SiteNotificationService;
 import ita.softserve.course_evaluation_admin.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -39,13 +39,14 @@ public class GroupServiceImpl implements GroupService {
     private final UserService userService;
     private final CourseService courseService;
     private final ChatRoomService chatRoomService;
+    private final SiteNotificationService siteNotificationService;
 
-
-    public GroupServiceImpl(GroupRepository groupRepository, UserService userService, CourseService courseService, ChatRoomService chatRoomService) {
+    public GroupServiceImpl(GroupRepository groupRepository, UserService userService, CourseService courseService, ChatRoomService chatRoomService, SiteNotificationService siteNotificationService) {
         this.groupRepository = groupRepository;
         this.userService = userService;
         this.courseService = courseService;
         this.chatRoomService = chatRoomService;
+        this.siteNotificationService = siteNotificationService;
     }
 
     @Override
@@ -158,6 +159,12 @@ public class GroupServiceImpl implements GroupService {
             throw new WrongIdException("The user with id: " + u.getId() + " is not a student!");
         });
         usersFound.forEach(u -> u.setGroup(groupFound));
+        usersFound.forEach(u ->
+                siteNotificationService.processCreateSiteNotification(
+                        "Added to the group!",
+                        "Hi " + u.getFirstName() + ", you have been added to the \"" + groupFound.getGroupName() + "\" group!",
+                        u.getId())
+        );
         List<User> groupFoundStudents = groupFound.getStudents();
         groupFound.setStudents(Stream.of(groupFoundStudents, usersFound).flatMap(Collection::stream).distinct().collect(Collectors.toList()));
         return groupRepository.save(groupFound);
@@ -177,6 +184,13 @@ public class GroupServiceImpl implements GroupService {
             throw new WrongIdException("The user with id: " + u.getId() + " isn't included in the group!");
         });
         usersFound.forEach(u -> u.setGroup(null));
+        usersFound.forEach(u ->
+                siteNotificationService.processCreateSiteNotification(
+                        "Deleted from the group!",
+                        "Hi " + u.getFirstName() + ", you have been deleted from the \"" + groupFound.getGroupName() + "\" group!",
+                        u.getId()
+                )
+        );
         List<User> groupFoundStudents = groupFound.getStudents();
         groupFoundStudents.removeAll(usersFound);
         groupFound.setStudents(groupFoundStudents);
