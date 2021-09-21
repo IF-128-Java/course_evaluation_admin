@@ -7,6 +7,7 @@ import ita.softserve.course_evaluation_admin.entity.Group;
 import ita.softserve.course_evaluation_admin.entity.Role;
 import ita.softserve.course_evaluation_admin.entity.User;
 import ita.softserve.course_evaluation_admin.repository.CourseRepository;
+import ita.softserve.course_evaluation_admin.service.SiteNotificationService;
 import ita.softserve.course_evaluation_admin.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,8 @@ class CourseServiceImplTest {
     private CourseRepository courseRepository;
     @Mock
     private UserService userService;
+    @Mock
+    private SiteNotificationService siteNotificationsService;
     @InjectMocks
     private CourseServiceImpl courseService;
 
