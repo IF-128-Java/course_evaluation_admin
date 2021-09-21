@@ -126,8 +126,7 @@ public class GroupServiceImpl implements GroupService {
                 siteNotificationService.processCreateSiteNotification(
                         "Started learning a new course!",
                         "Hi " + u.getFirstName() + ", your \"" + foundGroup.getGroupName() + "\" group started learning \""
-                                + foundCourse.getCourseName() + "\" course!",
-                        u.getId()
+                                + foundCourse.getCourseName() + "\" course!", u
                 )
         );
         return GroupDtoMapper.toDto(groupRepository.save(foundGroup));
@@ -147,8 +146,7 @@ public class GroupServiceImpl implements GroupService {
                 siteNotificationService.processCreateSiteNotification(
                         "Stopped learning the course!",
                         "Hi " + u.getFirstName() + ", your \"" + foundGroup.getGroupName() + "\" group stopped learning \""
-                                + foundCourse.getCourseName() + "\" course!",
-                        u.getId()
+                                + foundCourse.getCourseName() + "\" course!", u
                 )
         );
         return GroupDtoMapper.toDto(groupRepository.save(foundGroup));
@@ -178,8 +176,8 @@ public class GroupServiceImpl implements GroupService {
         usersFound.forEach(u ->
                 siteNotificationService.processCreateSiteNotification(
                         "Added to the group!",
-                        "Hi " + u.getFirstName() + ", you have been added to the \"" + groupFound.getGroupName() + "\" group!",
-                        u.getId())
+                        "Hi " + u.getFirstName() + ", you have been added to the \"" + groupFound.getGroupName() + "\" group!", u
+                )
         );
         List<User> groupFoundStudents = groupFound.getStudents();
         groupFound.setStudents(Stream.of(groupFoundStudents, usersFound).flatMap(Collection::stream).distinct().collect(Collectors.toList()));
@@ -203,8 +201,7 @@ public class GroupServiceImpl implements GroupService {
         usersFound.forEach(u ->
                 siteNotificationService.processCreateSiteNotification(
                         "Deleted from the group!",
-                        "Hi " + u.getFirstName() + ", you have been deleted from the \"" + groupFound.getGroupName() + "\" group!",
-                        u.getId()
+                        "Hi " + u.getFirstName() + ", you have been deleted from the \"" + groupFound.getGroupName() + "\" group!", u
                 )
         );
         List<User> groupFoundStudents = groupFound.getStudents();

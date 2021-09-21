@@ -8,21 +8,22 @@ import ita.softserve.course_evaluation_admin.entity.Role;
 import ita.softserve.course_evaluation_admin.entity.User;
 import ita.softserve.course_evaluation_admin.exception.exceptions.UserRoleException;
 import ita.softserve.course_evaluation_admin.repository.UserRepository;
+import ita.softserve.course_evaluation_admin.service.SiteNotificationService;
 import ita.softserve.course_evaluation_admin.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import javax.persistence.EntityNotFoundException;
 import java.util.Set;
-
 
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final SiteNotificationService siteNotificationService;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, SiteNotificationService siteNotificationService) {
         this.userRepository = userRepository;
+        this.siteNotificationService = siteNotificationService;
     }
 
     @Override
@@ -52,6 +53,26 @@ public class UserServiceImpl implements UserService {
             throw new UserRoleException("The user is a teacher in the course with name: " +
                     teachCourses.stream().findFirst().orElseThrow().getCourseName());
         }
+
+        roles.forEach(r -> {
+                    if (!foundUser.getRoles().contains(r))
+                        siteNotificationService.processCreateSiteNotification(
+                                "You've been given a new role!",
+                                "Hi " + foundUser.getFirstName() + ", we are glad to announce that you are now a " + r.name().substring(5) + "!",
+                                foundUser
+                        );
+                }
+        );
+        foundUser.getRoles().forEach(r -> {
+                    if (!roles.contains(r))
+                        siteNotificationService.processCreateSiteNotification(
+                                "The role was taken away from you!",
+                                "Hi " + foundUser.getFirstName() + ", unfortunately you are no longer a " + r.name().substring(5) + "!",
+                                foundUser
+                        );
+                }
+        );
+
         foundUser.setRoles(roles);
         return UserDtoMapper.toDto(userRepository.save(foundUser));
     }
