@@ -6,6 +6,7 @@ import ita.softserve.course_evaluation_admin.entity.Role;
 import ita.softserve.course_evaluation_admin.entity.User;
 import ita.softserve.course_evaluation_admin.exception.exceptions.UserRoleException;
 import ita.softserve.course_evaluation_admin.repository.UserRepository;
+import ita.softserve.course_evaluation_admin.service.SiteNotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +42,9 @@ class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private SiteNotificationService siteNotificationsService;
 
     @InjectMocks
     private UserServiceImpl userService;
