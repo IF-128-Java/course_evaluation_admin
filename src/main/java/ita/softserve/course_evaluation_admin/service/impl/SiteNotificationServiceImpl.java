@@ -6,7 +6,6 @@ import ita.softserve.course_evaluation_admin.entity.SiteNotification;
 import ita.softserve.course_evaluation_admin.entity.User;
 import ita.softserve.course_evaluation_admin.repository.SiteNotificationRepository;
 import ita.softserve.course_evaluation_admin.service.SiteNotificationService;
-import ita.softserve.course_evaluation_admin.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -20,12 +19,9 @@ public class SiteNotificationServiceImpl implements SiteNotificationService {
 
     private final SiteNotificationRepository siteNotificationRepository;
     private final SimpMessagingTemplate messagingTemplate;
-    private final UserService userService;
 
     @Override
-    public void processCreateSiteNotification(String header, String content, Long userId) {
-        User user = userService.findById(userId);
-
+    public void processCreateSiteNotification(String header, String content, User user) {
         SiteNotification notification = SiteNotification.builder()
                 .header(header)
                 .content(content)
