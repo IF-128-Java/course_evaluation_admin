@@ -18,7 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    public static final String[] PUBLIC_URL = {
+    private static final String[] PUBLIC_URL = {
             "/",
             "/v2/**",
             "/webjars/**",
@@ -28,12 +28,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/configuration/ui",
             "/swagger-resources/**",
             "/configuration/security",
-            "/api/v1/auth/restorePassword",
-            "/api/v1/auth/changePassword",
-            "/api/v1/auth/confirm",
-            "/api/v1/auth/reg",
-            "/api/v1/auth/login",
-            "/api/v1/connect-ws/**",
+            "/api/v1/admin/connect-ws/**",
     };
 
     private final JwtConfigurer jwtConfigurer;
@@ -49,7 +44,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/v1/admin/connect-ws/**").permitAll()
                 .antMatchers(PUBLIC_URL).permitAll()
                 .anyRequest().hasAuthority("UPDATE")
                 .and()
