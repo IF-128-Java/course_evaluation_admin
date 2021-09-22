@@ -1,5 +1,10 @@
 package ita.softserve.course_evaluation_admin.controller;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import ita.softserve.course_evaluation_admin.constants.HttpStatuses;
+import ita.softserve.course_evaluation_admin.dto.CourseDto;
 import ita.softserve.course_evaluation_admin.dto.UserDto;
 import ita.softserve.course_evaluation_admin.service.UserService;
 import org.springframework.data.domain.Page;
@@ -25,6 +30,11 @@ public class UserController {
         this.userService = userService;
     }
 
+    @ApiOperation(value = "Get all Users list by sized pages and sorted in some direction")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = HttpStatuses.OK, response = CourseDto.class),
+            @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
     @GetMapping
     public ResponseEntity<Page<UserDto>> getAll(@RequestParam int page, @RequestParam int size,
                                                 @RequestParam String search, @RequestParam String order
@@ -35,11 +45,25 @@ public class UserController {
                 .body(userService.findAllUserDto(search, roles, pageRequest));
     }
 
+    @ApiOperation(value = "Get User by ID")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = HttpStatuses.OK),
+            @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
+            @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findUserDtoById(id));
     }
 
+    @ApiOperation(value = "Update User role")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = HttpStatuses.OK, response = CourseDto.class),
+            @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
+            @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
     @PatchMapping("/add-roles")
     public ResponseEntity<UserDto> updateRole(@RequestBody UserDto dto) {
         return ResponseEntity.status(HttpStatus.OK)
